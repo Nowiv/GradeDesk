@@ -9,6 +9,14 @@ module ch.gradedesk {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.net.http;
+
+    // Nicht im Code referenziert, aber zwingend: jdk.crypto.ec liefert den
+    // Sicherheitsanbieter SunEC. Ohne ein "requires" lässt jlink dieses Modul
+    // weg, weil es nur über einen Dienst gefunden wird und nicht über eine
+    // Abhängigkeit. In der fertigen Runtime scheitert dann jeder HTTPS-Aufbau
+    // zu api.github.com mit "handshake_failure", weil der Server einen
+    // Schlüsselaustausch über elliptische Kurven verlangt.
+    requires jdk.crypto.ec;
     requires java.desktop;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
