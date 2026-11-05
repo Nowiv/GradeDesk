@@ -6,6 +6,11 @@ name: Release
 #
 # Each installer includes its own Java runtime created with jlink.
 # Users do not need to install Java separately.
+#
+# Runner images are pinned on purpose: the "-latest" labels move to new
+# operating system versions without notice (ubuntu-latest is currently
+# migrating to Ubuntu 26.04), which would change the build environment
+# of a release build underneath us.
 
 on:
   push:
@@ -25,40 +30,49 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - os: windows-2025
             label: Windows
             artifact: gradedesk-windows
             pattern: target/installer/*.msi
 
-          - os: macos-latest
+          - os: macos-15
             label: macOS
             artifact: gradedesk-macos
             pattern: target/installer/*.dmg
 
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             label: Linux
             artifact: gradedesk-linux
             pattern: target/installer/*.deb
 
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
 
-      - name: Install WiX Toolset
-        if: matrix.os == 'windows-latest'
+      - name: Provide WiX 3 for jpackage
+        if: runner.os == 'Windows'
         shell: pwsh
-        run: choco install wixtoolset --no-progress -y
-
-      - name: Install tools for Debian packaging
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install --yes fakeroot binutils
+        run: |
+          # jpackage on JDK 21 builds MSI packages with candle.exe and
+          # light.exe, which only exist in WiX 3.x. The windows-2025 image
+          # ships WiX 3.14, so install it only if it is ever missing, and
+          # always put the resolved directory on PATH for the later steps.
+          $bin = (Get-ChildItem 'C:\Program Files (x86)\WiX Toolset v3*\bin\candle.exe' -ErrorAction SilentlyContinue |
+                  Select-Object -First 1).DirectoryName
+          if (-not $bin) {
+            choco install wixtoolset --version 3.14.1.20250415 --no-progress -y
+            $bin = (Get-ChildItem 'C:\Program Files (x86)\WiX Toolset v3*\bin\candle.exe' |
+                    Select-Object -First 1).DirectoryName
+          }
+          Write-Host "Using WiX from $bin"
+          $bin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
       - name: Run tests
         run: ./mvnw --batch-mode verify
@@ -69,7 +83,7 @@ jobs:
         shell: bash
 
       - name: Upload installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.pattern }}
@@ -78,18 +92,18 @@ jobs:
   release:
     name: Publish GitHub Release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Download installers
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: installer
           merge-multiple: true
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: installer/*
           draft: false
