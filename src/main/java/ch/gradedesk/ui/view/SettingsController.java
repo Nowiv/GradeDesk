@@ -7,6 +7,7 @@ import ch.gradedesk.persistence.dto.GradeBookDto;
 import ch.gradedesk.service.GradeBookService;
 import ch.gradedesk.ui.AppServices;
 import ch.gradedesk.ui.ViewController;
+import ch.gradedesk.ui.control.AppearanceSwitch;
 import ch.gradedesk.ui.control.LanguageSwitch;
 import ch.gradedesk.ui.util.Icons;
 import javafx.animation.PauseTransition;
@@ -43,6 +44,9 @@ public final class SettingsController implements ViewController {
 
     @FXML
     private VBox languageSwitchBox;
+
+    @FXML
+    private VBox appearanceSwitchBox;
     @FXML
     private Label pathLabel;
     @FXML
@@ -63,6 +67,7 @@ public final class SettingsController implements ViewController {
         this.gradeBook = services.gradeBook().getGradeBook();
 
         languageSwitchBox.getChildren().add(new LanguageSwitch());
+        appearanceSwitchBox.getChildren().add(new AppearanceSwitch());
 
         pathLabel.setText(service.describeLocation());
         storageDetailLabel.setText(

@@ -19,6 +19,7 @@
             styleClass="app-shell">
 
     <left>
+      <HBox styleClass="sidebar-dock">
         <VBox styleClass="sidebar">
             <VBox styleClass="sidebar__brand">
                 <HBox styleClass="sidebar__wordmark">
@@ -38,6 +39,7 @@
                 <Label fx:id="languageLabel" styleClass="sidebar__section-label"/>
             </VBox>
         </VBox>
+      </HBox>
     </left>
 
     <center>

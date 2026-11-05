@@ -2,88 +2,112 @@ package ch.gradedesk.ui.util;
 
 import javafx.scene.Group;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 
 /**
  * Die Symbole der Anwendung als selbst gezeichnete SVG-Pfade.
  *
- * <p>Alle Pfade liegen auf einem 24er-Raster, sind durchgehend gefüllt und
- * verwenden dieselbe Eckrundung. Bewusst keine Emoji und keine Unicode-Zeichen
- * als Symbolersatz: die würden je nach Betriebssystem anders aussehen.</p>
+ * <p>Linien-Stil auf einem 24er-Raster, durchgehend 1.7 px stark, mit runden
+ * Enden und Ecken. Das ist der Charakter von Apples SF Symbols, ohne deren
+ * Dateien zu verwenden: SF Symbols sind lizenzrechtlich an Apple-Plattformen
+ * gebunden und duerfen hier nicht mitgeliefert werden.</p>
+ *
+ * <p>Gezeichnet wird mit Kontur statt Fuellung. Die Farbe kommt deshalb aus
+ * {@code -fx-stroke}, nicht aus {@code -fx-fill} – siehe {@code .icon} in
+ * app.css. Bewusst keine Emoji und keine Unicode-Zeichen als Symbolersatz:
+ * die wuerden je nach Betriebssystem anders aussehen.</p>
  */
 public final class Icons {
 
-    /** Übersicht: vier Felder. */
+    /** Staerke der Linien auf dem 24er-Raster. */
+    private static final double STROKE_WIDTH = 1.7;
+
+    /** Uebersicht: vier Felder. */
     public static final String OVERVIEW =
-            "M5.5 4h4a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 4 9.5v-4A1.5 1.5 0 0 1 5.5 4z"
-            + "M14.5 4h4a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 13 9.5v-4A1.5 1.5 0 0 1 14.5 4z"
-            + "M5.5 13h4a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 4 18.5v-4A1.5 1.5 0 0 1 5.5 13z"
-            + "M14.5 13h4a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5v-4a1.5 1.5 0 0 1 1.5-1.5z";
+            "M4.75 4.75h5.5v5.5h-5.5z"
+            + "M13.75 4.75h5.5v5.5h-5.5z"
+            + "M4.75 13.75h5.5v5.5h-5.5z"
+            + "M13.75 13.75h5.5v5.5h-5.5z";
 
     /** Semester und Module: gestapelte Zeilen. */
     public static final String MODULES =
-            "M6 5h12a2 2 0 0 1 0 4H6a2 2 0 0 1 0-4z"
-            + "M6 10h12a2 2 0 0 1 0 4H6a2 2 0 0 1 0-4z"
-            + "M6 15h6a2 2 0 0 1 0 4H6a2 2 0 0 1 0-4z";
+            "M4.75 6.5h14.5"
+            + "M4.75 12h14.5"
+            + "M4.75 17.5h8.5";
 
-    /** Diagramm: drei Säulen. */
+    /** Diagramm: drei Saeulen auf einer Grundlinie. */
     public static final String CHART =
-            "M5.5 13h1a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 18.5v-4A1.5 1.5 0 0 1 5.5 13z"
-            + "M11.5 8h1a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 10 18.5v-9A1.5 1.5 0 0 1 11.5 8z"
-            + "M17.5 4h1a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 17.5 4z";
+            "M4.75 19.25h14.5"
+            + "M7.5 19.25v-5"
+            + "M12 19.25v-9.5"
+            + "M16.5 19.25v-7";
 
     /** Einstellungen: zwei Schieberegler. */
     public static final String SETTINGS =
-            "M5 7h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"
-            + "M9 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"
-            + "M5 15h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"
-            + "M15 13a3 3 0 1 0 0 6 3 3 0 0 0 0-6z";
+            "M4.75 8.5h14.5"
+            + "M4.75 15.5h14.5"
+            + "M9.5 6.6a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8z"
+            + "M15 13.6a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8z";
 
-    /** Plus: etwas hinzufügen. */
+    /** Plus: etwas hinzufuegen. */
     public static final String PLUS =
-            "M12 4.5a1.5 1.5 0 0 1 1.5 1.5v5h5a1.5 1.5 0 0 1 0 3h-5v5a1.5 1.5 0 0 1-3 0v-5h-5a1.5 1.5 0 0 1 0-3h5V6a1.5 1.5 0 0 1 1.5-1.5z";
+            "M12 5.5v13"
+            + "M5.5 12h13";
 
     /** Stift: bearbeiten. */
     public static final String EDIT =
-            "M16.2 3.6a2 2 0 0 1 2.8 0l1.4 1.4a2 2 0 0 1 0 2.8l-1.3 1.3-4.2-4.2 1.3-1.3z"
-            + "M13.5 6.3l4.2 4.2-8.1 8.1-5.1.9.9-5.1 8.1-8.1z";
+            "M16.4 4.6a1.9 1.9 0 0 1 2.7 2.7l-9.6 9.6-3.6.9.9-3.6 9.6-9.6z"
+            + "M14.8 6.2l3 3";
 
-    /** Papierkorb: löschen. */
+    /** Papierkorb: loeschen. */
     public static final String DELETE =
-            "M9.5 3h5a1.5 1.5 0 0 1 1.5 1.5V5h3.5a1 1 0 0 1 0 2h-15a1 1 0 0 1 0-2H8V4.5A1.5 1.5 0 0 1 9.5 3z"
-            + "M6 8.5h12l-.8 10.2A2.4 2.4 0 0 1 14.8 21H9.2a2.4 2.4 0 0 1-2.4-2.3L6 8.5z";
+            "M5.5 7h13"
+            + "M9.75 7V5.6a1 1 0 0 1 1-1h2.5a1 1 0 0 1 1 1V7"
+            + "M7.3 7l.75 11.4a1.6 1.6 0 0 0 1.6 1.5h4.7a1.6 1.6 0 0 0 1.6-1.5L16.7 7"
+            + "M10.4 10.5v6"
+            + "M13.6 10.5v6";
 
     /** Ausrufezeichen im Kreis: Hinweis. */
     public static final String ALERT =
-            "M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19z"
-            + "M12.9 6.8l-.3 7.1h-1.2l-.3-7.1h1.8z"
-            + "M12 15.6a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6z";
+            "M12 4.4a7.6 7.6 0 1 0 0 15.2 7.6 7.6 0 0 0 0-15.2z"
+            + "M12 8.2v4.6"
+            + "M12 15.8v.1";
 
     /** Kopieren. */
     public static final String COPY =
-            "M9 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"
-            + "M5.5 7H6v10a2.5 2.5 0 0 0 2.5 2.5H16v.5a2 2 0 0 1-2 2H7a3.5 3.5 0 0 1-3.5-3.5V9a2 2 0 0 1 2-2z";
+            "M9.6 4.75h7.9a1.9 1.9 0 0 1 1.9 1.9v7.9a1.9 1.9 0 0 1-1.9 1.9h-7.9a1.9 1.9 0 0 1-1.9-1.9v-7.9a1.9 1.9 0 0 1 1.9-1.9z"
+            + "M15.4 19.25H6.5a1.9 1.9 0 0 1-1.9-1.9V8.5";
 
     /** Schloss: lokale Speicherung. */
     public static final String LOCK =
-            "M12 2.5A4.5 4.5 0 0 0 7.5 7v2.5H9V7a3 3 0 0 1 6 0v2.5h1.5V7A4.5 4.5 0 0 0 12 2.5z"
-            + "M6.5 10h11A1.5 1.5 0 0 1 19 11.5v8A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5v-8A1.5 1.5 0 0 1 6.5 10z";
+            "M7.6 10.3V7.7a4.4 4.4 0 0 1 8.8 0v2.6"
+            + "M6.9 10.3h10.2a1.6 1.6 0 0 1 1.6 1.6v6.1a1.6 1.6 0 0 1-1.6 1.6H6.9a1.6 1.6 0 0 1-1.6-1.6v-6.1a1.6 1.6 0 0 1 1.6-1.6z";
 
     private Icons() {
     }
 
     /**
-     * Erzeugt ein Symbol in der gewünschten Kantenlänge.
+     * Erzeugt ein Symbol in der gewuenschten Kantenlaenge.
      *
-     * <p>Der Pfad steckt in einer {@link Group}, damit die Skalierung auch in die
-     * Layoutgrösse einfliesst und das Symbol im Fluss korrekt Platz beansprucht.</p>
+     * <p>Der Pfad steckt in einer {@link Group}, damit die Skalierung auch in
+     * die Layoutgroesse einfliesst und das Symbol im Fluss korrekt Platz
+     * beansprucht.</p>
      *
      * @param path       eine der Pfadkonstanten dieser Klasse
-     * @param size       Kantenlänge in Pixeln (das Raster ist 24 px gross)
-     * @param styleClass zusätzliche Stilklassen für die Einfärbung
+     * @param size       Kantenlaenge in Pixeln (das Raster ist 24 px gross)
+     * @param styleClass zusaetzliche Stilklassen fuer die Einfaerbung
      */
     public static Group create(String path, double size, String... styleClass) {
         SVGPath shape = new SVGPath();
         shape.setContent(path);
+
+        // Kontur statt Fuellung: das ergibt den Linien-Stil.
+        shape.setFill(null);
+        shape.setStrokeWidth(STROKE_WIDTH);
+        shape.setStrokeLineCap(StrokeLineCap.ROUND);
+        shape.setStrokeLineJoin(StrokeLineJoin.ROUND);
+
         double scale = size / 24.0;
         shape.setScaleX(scale);
         shape.setScaleY(scale);

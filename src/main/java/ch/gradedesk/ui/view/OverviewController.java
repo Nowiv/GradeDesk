@@ -6,6 +6,7 @@ import ch.gradedesk.model.Semester;
 import ch.gradedesk.service.GradeBookService;
 import ch.gradedesk.service.GradeValidator;
 import ch.gradedesk.ui.AppServices;
+import javafx.geometry.Insets;
 import ch.gradedesk.ui.ViewController;
 import ch.gradedesk.ui.control.Dialogs;
 import ch.gradedesk.ui.control.GradeTrack;
@@ -20,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
@@ -137,7 +139,13 @@ public final class OverviewController implements ViewController {
             card.getChildren().add(createNoModulesState(semester));
             return card;
         }
-        semester.getModules().forEach(module -> card.getChildren().add(createModuleRow(module)));
+        List<CourseModule> modules = semester.getModules();
+        for (int index = 0; index < modules.size(); index++) {
+            if (index > 0) {
+                card.getChildren().add(createRowSeparator());
+            }
+            card.getChildren().add(createModuleRow(modules.get(index)));
+        }
         return card;
     }
 
@@ -199,6 +207,22 @@ public final class OverviewController implements ViewController {
     }
 
     // ----- Modulzeile -----------------------------------------------------
+
+    /**
+     * Die Haarlinie zwischen zwei Zeilen.
+     *
+     * <p>Sie beginnt dort, wo der Text beginnt, und nicht am Kartenrand. Das
+     * ist in iOS der Unterschied zwischen «sieht richtig aus» und «fast».</p>
+     */
+    private static Node createRowSeparator() {
+        Region line = new Region();
+        line.getStyleClass().add("row-separator");
+        HBox.setHgrow(line, Priority.ALWAYS);
+
+        HBox inset = new HBox(line);
+        HBox.setMargin(line, new Insets(0, 0, 0, 18));
+        return inset;
+    }
 
     private Node createModuleRow(CourseModule module) {
         BigDecimal rounded = module.getRoundedGrade();
