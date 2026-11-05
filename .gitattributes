@@ -1,0 +1,10 @@
+# Einheitliche Zeilenenden im Repository, unabhängig vom Betriebssystem.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.ico binary
+*.icns binary
+*.png binary
+*.jar binary
