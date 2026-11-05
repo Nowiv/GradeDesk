@@ -53,7 +53,7 @@
                             <Label styleClass="card__title" text="%settings.storage.title"/>
                             <Label styleClass="card__meta" text="%settings.storage.subtitle"/>
                         </VBox>
-                        <Button fx:id="copyPathButton" styleClass="btn,btn-secondary"
+                        <Button fx:id="copyPathButton" styleClass="btn,btn-tinted"
                                 text="%settings.copyPath"/>
                     </HBox>
                     <VBox styleClass="card__body">

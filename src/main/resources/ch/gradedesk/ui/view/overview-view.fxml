@@ -17,7 +17,7 @@
                 <Label styleClass="page-title" text="%overview.title"/>
                 <Label fx:id="subtitleLabel" styleClass="page-subtitle"/>
             </VBox>
-            <Button fx:id="addSemesterButton" styleClass="btn,btn-primary"
+            <Button fx:id="addSemesterButton" styleClass="btn,btn-filled"
                     text="%overview.addSemester"/>
         </HBox>
     </top>

@@ -42,7 +42,7 @@
                 <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
                     <ListView fx:id="semesterList" VBox.vgrow="ALWAYS"/>
                     <Button fx:id="addSemesterButton" maxWidth="1.7976931348623157E308"
-                            styleClass="btn,btn-secondary" text="%semesters.newSemester"/>
+                            styleClass="btn,btn-tinted" text="%semesters.newSemester"/>
                 </VBox>
             </VBox>
 
@@ -60,7 +60,7 @@
                 <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
                     <ListView fx:id="moduleList" VBox.vgrow="ALWAYS"/>
                     <Button fx:id="addModuleButton" maxWidth="1.7976931348623157E308"
-                            styleClass="btn,btn-secondary" text="%semesters.newModule"/>
+                            styleClass="btn,btn-tinted" text="%semesters.newModule"/>
                 </VBox>
             </VBox>
 
@@ -90,7 +90,7 @@
                         </columns>
                     </TableView>
                     <Button fx:id="addGradeButton" maxWidth="1.7976931348623157E308"
-                            styleClass="btn,btn-primary" text="%semesters.newGrade"/>
+                            styleClass="btn,btn-filled" text="%semesters.newGrade"/>
                 </VBox>
             </VBox>
 

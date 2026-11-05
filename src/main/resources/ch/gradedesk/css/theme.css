@@ -1,181 +1,74 @@
 /*
- * Theme: alle Farben von GradeDesk an einer Stelle.
+ * GradeDesk – Farbpalette DUNKEL (Windows-11-Explorer-Stil).
  *
- * Grundlage ist Apples Systempalette. Die Namen folgen absichtlich denen aus
- * den Human Interface Guidelines (label, secondaryLabel, separator,
- * systemBlue, systemGroupedBackground ...), damit jeder Wert nachschlagbar
- * bleibt. Apple definiert für hell und dunkel zwei vollstaendige Saetze – die
- * dunklen Werte sind keine Umkehrung der hellen, sondern eigene Farben.
+ * Exakt dieselben Variablen wie theme.css. Zum Umschalten statt theme.css
+ * diese Datei laden (siehe Hinweis in der Antwort).
  *
- * JavaFX kennt "looked-up colors": ein Name, der mit -ios- beginnt, wird hier
- * einmal definiert und in app.css nur noch referenziert. Wer die Anwendung
- * umfaerben will, aendert ausschliesslich diese Datei.
- *
- * Das Erscheinungsbild haengt an einer Stilklasse an der Wurzel der Szene.
- * ".root.appearance-dark" ist spezifischer als ".root" und gewinnt deshalb.
+ * Im Dunkeln wird die Notenskala umgekehrt: hoehere Noten sind HELLER,
+ * damit "besser" auf dunklem Grund weiterhin "staerker" liest.
  */
 
-/* ======================================================================
- * Gemeinsames: Schrift und Geometrie
- * ====================================================================== */
-
 .root {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
 
-    /*
-     * Apples SF Pro darf ausserhalb von Apple-Plattformen nicht weitergegeben
-     * werden. Inter ist eine freie Schrift mit sehr aehnlichen Proportionen und
-     * wird mitgeliefert; dahinter stehen die Systemschriften als Rueckfall.
-     */
-    -fx-font-family: "Inter", "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", sans-serif;
-    -fx-font-size: 15px;
+    /* Flaechen */
+    -ui-bg-sidebar:          #202020;
+    -ui-bg-base:             #272727;
+    -ui-bg-surface:          #2e2e2e;
+    -ui-bg-raised:           #373737;
+    -ui-bg-input:            #333333;
+    -ui-bg-input-focus:      #1f1f1f;
+    -ui-bg-overlay:          #2c2c2c;
+    -ui-bg-hover:            rgba(255, 255, 255, 0.055);
+    -ui-bg-active:           rgba(255, 255, 255, 0.085);
+    -ui-control-hover:       #3c3c3c;
+    -ui-control-pressed:     #323232;
+    -ui-nav-hover:           #2b2b2b;
+    -ui-nav-active:          #323232;
 
-    -fx-faint-focus-color: transparent;
-}
+    /* Explorer-Auswahl */
+    -ui-row-hover:           #363636;
+    -ui-selection:           #434343;
+    -ui-selection-stroke:    #5c5c5c;
 
-/* ======================================================================
- * Hell – der Standard, wie ihn iOS zeigt
- * ====================================================================== */
+    /* Kanten */
+    -ui-border:              #1d1d1d;
+    -ui-border-strong:       #161616;
+    -ui-separator:           #3a3a3a;
+    -ui-layer-stroke:        #1a1a1a;
+    -ui-stroke-control:      #454545;
+    -ui-stroke-control-bottom: #3d3d3d;
+    -ui-stroke-input-bottom: #9a9a9a;
+    -ui-scroll-thumb:        #9f9f9f;
+    -ui-track:               #3d3d3d;
+    -ui-focus:               #ffffff;
 
-.root,
-.root.appearance-light {
+    /* Text */
+    -ui-text:                #ffffff;
+    -ui-text-secondary:      #cfcfcf;
+    -ui-text-tertiary:       #a6a6a6;
+    -ui-text-quaternary:     #6e6e6e;
+    -ui-text-on-accent:      #000000;
 
-    /* --- Akzent ----------------------------------------------------------- */
-    -ios-blue: #007aff;
-    -ios-blue-pressed: #0062cc;
-    -ios-blue-wash: rgba(0, 122, 255, 0.12);
-    -ios-indigo: #5856d6;
-    -ios-red: #ff3b30;
-    -ios-red-wash: rgba(255, 59, 48, 0.12);
-    -ios-green: #34c759;
-    -ios-orange: #ff9500;
-    -ios-orange-wash: rgba(255, 149, 0, 0.14);
+    /* Akzent */
+    -ui-accent:              #60cdff;
+    -ui-accent-bright:       #58bae7;
+    -ui-accent-pressed:      #4fa8d3;
+    -ui-accent-wash:         #2e5875;
 
-    /* --- Text ------------------------------------------------------------- */
-    -ios-label: #000000;
-    -ios-label-secondary: #6a6a70;
-    -ios-label-tertiary: #9a9aa0;
-    -ios-label-quaternary: #babac0;
-    -ios-label-on-accent: #ffffff;
+    /* Signalfarben */
+    -ui-pass:                #6ccb5f;
+    -ui-pass-wash:           #393d1b;
+    -ui-fail:                #ff99a4;
+    -ui-fail-wash:           #442726;
+    -ui-warn:                #fce100;
+    -ui-warn-wash:           #433519;
 
-    /* --- Flaechen ----------------------------------------------------------
-     * "Grouped" ist der Untergrund einer Liste, "grouped elevated" die Karte
-     * darauf. In Hell ist der Untergrund grau und die Karte weiss.
-     */
-    -ios-bg-grouped: #f2f2f7;
-    -ios-bg-elevated: #ffffff;
-    -ios-bg-elevated-hover: #f7f7fa;
-    -ios-fill-quaternary: rgba(116, 116, 128, 0.08);
-    -ios-fill-tertiary: rgba(118, 118, 128, 0.12);
-    -ios-fill-secondary: rgba(120, 120, 128, 0.16);
-    -ios-separator: rgba(60, 60, 67, 0.2);
-    -ios-separator-opaque: #c6c6c8;
-
-    /* --- Liquid Glass ------------------------------------------------------
-     * Durchscheinend, nimmt die Farbe des Untergrunds auf, heller Lichtrand
-     * oben. Siehe app.css fuer den Aufbau aus mehreren Ebenen.
-     */
-    -ios-glass-fill: rgba(255, 255, 255, 0.72);
-    -ios-glass-fill-strong: rgba(255, 255, 255, 0.86);
-    -ios-glass-specular: rgba(255, 255, 255, 0.95);
-    -ios-glass-edge: rgba(255, 255, 255, 0.9);
-    -ios-glass-rim: rgba(0, 0, 0, 0.08);
-    -ios-glass-shadow: rgba(0, 0, 0, 0.14);
-
-    /* --- Hintergrund der Anwendung ------------------------------------------
-     * Liquid Glass braucht etwas, das es aufnehmen kann. Ein ruhiger farbiger
-     * Verlauf gibt dem Material Farbe, ohne vom Inhalt abzulenken.
-     */
-    -ios-canvas-1: #eef1f8;
-    -ios-canvas-2: #e7ecf7;
-    -ios-canvas-tint-blue: rgba(0, 122, 255, 0.16);
-    -ios-canvas-tint-indigo: rgba(88, 86, 214, 0.13);
-    -ios-canvas-tint-teal: rgba(48, 176, 199, 0.10);
-
-    /* --- Notenfarben --------------------------------------------------------
-     * Abgeleitet von systemRed und systemGreen, dazwischen eine gleichmaessig
-     * steigende Reihe. Sie bedeuten ausschliesslich Notenwerte.
-     */
-    -ios-grade-insufficient: #ff3b30;
-    -ios-grade-40: #9ad9ad;
-    -ios-grade-45: #6bce8b;
-    -ios-grade-50: #34c759;
-    -ios-grade-55: #27a349;
-    -ios-grade-60: #1a7f37;
-
-    -ios-badge-ok-bg: rgba(52, 199, 89, 0.14);
-    -ios-badge-ok-text: #1a7f37;
-    -ios-badge-fail-bg: rgba(255, 59, 48, 0.12);
-    -ios-badge-fail-text: #c42b22;
-
-    /* --- Diagramm ------------------------------------------------------------ */
-    -ios-chart-grid: rgba(60, 60, 67, 0.14);
-    -ios-chart-threshold: #3c3c43;
-
-    -fx-text-fill: -ios-label;
-    -fx-focus-color: -ios-blue;
-    -fx-background-color: -ios-bg-grouped;
-}
-
-/* ======================================================================
- * Dunkel – eigener Farbsatz, keine Umkehrung
- * ====================================================================== */
-
-.root.appearance-dark {
-
-    -ios-blue: #0a84ff;
-    -ios-blue-pressed: #409cff;
-    -ios-blue-wash: rgba(10, 132, 255, 0.22);
-    -ios-indigo: #5e5ce6;
-    -ios-red: #ff453a;
-    -ios-red-wash: rgba(255, 69, 58, 0.2);
-    -ios-green: #30d158;
-    -ios-orange: #ff9f0a;
-    -ios-orange-wash: rgba(255, 159, 10, 0.18);
-
-    -ios-label: #ffffff;
-    -ios-label-secondary: #a0a0a8;
-    -ios-label-tertiary: #78787e;
-    -ios-label-quaternary: #5a5a60;
-    -ios-label-on-accent: #ffffff;
-
-    -ios-bg-grouped: #000000;
-    -ios-bg-elevated: #1c1c1e;
-    -ios-bg-elevated-hover: #2c2c2e;
-    -ios-fill-quaternary: rgba(118, 118, 128, 0.18);
-    -ios-fill-tertiary: rgba(118, 118, 128, 0.24);
-    -ios-fill-secondary: rgba(120, 120, 128, 0.32);
-    -ios-separator: rgba(84, 84, 88, 0.65);
-    -ios-separator-opaque: #38383a;
-
-    -ios-glass-fill: rgba(44, 44, 48, 0.68);
-    -ios-glass-fill-strong: rgba(54, 54, 58, 0.82);
-    -ios-glass-specular: rgba(255, 255, 255, 0.28);
-    -ios-glass-edge: rgba(255, 255, 255, 0.18);
-    -ios-glass-rim: rgba(0, 0, 0, 0.5);
-    -ios-glass-shadow: rgba(0, 0, 0, 0.55);
-
-    -ios-canvas-1: #07070a;
-    -ios-canvas-2: #101018;
-    -ios-canvas-tint-blue: rgba(10, 132, 255, 0.22);
-    -ios-canvas-tint-indigo: rgba(94, 92, 230, 0.2);
-    -ios-canvas-tint-teal: rgba(64, 200, 224, 0.12);
-
-    -ios-grade-insufficient: #ff453a;
-    -ios-grade-40: #a7e8bb;
-    -ios-grade-45: #6ee398;
-    -ios-grade-50: #30d158;
-    -ios-grade-55: #23b14a;
-    -ios-grade-60: #16903b;
-
-    -ios-badge-ok-bg: rgba(48, 209, 88, 0.18);
-    -ios-badge-ok-text: #7ce79b;
-    -ios-badge-fail-bg: rgba(255, 69, 58, 0.2);
-    -ios-badge-fail-text: #ff9b94;
-
-    -ios-chart-grid: rgba(235, 235, 245, 0.14);
-    -ios-chart-threshold: #ebebf5;
-
-    -fx-text-fill: -ios-label;
-    -fx-focus-color: -ios-blue;
-    -fx-background-color: -ios-bg-grouped;
+    /* Notenskala 4.0 -> 6.0, dunkel nach hell */
+    -ui-pass-light:          #2f5e2b;
+    -ui-pass-mid:            #3f7f38;
+    -ui-pass-base:           #54a24a;
+    -ui-pass-strong:         #6ccb5f;
+    -ui-pass-deep:           #9be08f;
 }
