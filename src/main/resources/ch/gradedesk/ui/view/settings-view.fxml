@@ -60,7 +60,7 @@
 
                 <VBox styleClass="card">
                     <HBox styleClass="card__header">
-                        <VBox HBox.hgrow="ALWAY">
+                        <VBox HBox.hgrow="ALWAYS">
                             <Label styleClass="card__title" text="%settings.storage.title"/>
                             <Label styleClass="card__meta" text="%settings.storage.subtitle"/>
                         </VBox>
