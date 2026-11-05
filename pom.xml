@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.notenrechner</groupId>
-    <artifactId>notenrechner</artifactId>
+    <groupId>ch.gradedesk</groupId>
+    <artifactId>gradedesk</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Notenrechner</name>
+    <name>GradeDesk</name>
     <description>Lokale Desktop-Anwendung zum Erfassen und Auswerten von Schulnoten (Schweizer Notenskala 1-6).</description>
 
     <properties>
@@ -21,11 +21,11 @@
         <jackson.version>2.18.2</jackson.version>
         <junit.version>5.11.4</junit.version>
 
-        <app.module>ch.notenrechner</app.module>
-        <app.mainClass>ch.notenrechner.NotenrechnerApp</app.mainClass>
-        <app.launcher>Notenrechner</app.launcher>
+        <app.module>ch.gradedesk</app.module>
+        <app.mainClass>ch.gradedesk.GradeDeskApp</app.mainClass>
+        <app.launcher>GradeDesk</app.launcher>
         <app.runtimeImage>runtime</app.runtimeImage>
-        <app.vendor>Notenrechner</app.vendor>
+        <app.vendor>GradeDesk</app.vendor>
     </properties>
 
     <dependencies>
@@ -141,7 +141,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <name>Notenrechner</name>
+                            <name>GradeDesk</name>
                             <appVersion>${project.version}</appVersion>
                             <vendor>${app.vendor}</vendor>
                             <copyright>${app.vendor}</copyright>
@@ -168,9 +168,9 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>MSI</type>
-                            <icon>packaging/windows/Notenrechner.ico</icon>
+                            <icon>packaging/windows/GradeDesk.ico</icon>
                             <winMenu>true</winMenu>
-                            <winMenuGroup>Notenrechner</winMenuGroup>
+                            <winMenuGroup>GradeDesk</winMenuGroup>
                             <winShortcut>true</winShortcut>
                             <winDirChooser>true</winDirChooser>
                             <winPerUserInstall>true</winPerUserInstall>
@@ -195,9 +195,9 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>DMG</type>
-                            <icon>packaging/macos/Notenrechner.icns</icon>
-                            <macPackageName>Notenrechner</macPackageName>
-                            <macPackageIdentifier>ch.notenrechner.app</macPackageIdentifier>
+                            <icon>packaging/macos/GradeDesk.icns</icon>
+                            <macPackageName>GradeDesk</macPackageName>
+                            <macPackageIdentifier>ch.gradedesk.app</macPackageIdentifier>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -219,11 +219,11 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>DEB</type>
-                            <icon>packaging/linux/Notenrechner.png</icon>
+                            <icon>packaging/linux/GradeDesk.png</icon>
                             <linuxShortcut>true</linuxShortcut>
                             <linuxMenuGroup>Education</linuxMenuGroup>
-                            <linuxPackageName>notenrechner</linuxPackageName>
-                            <linuxDebMaintainer>notenrechner@localhost</linuxDebMaintainer>
+                            <linuxPackageName>gradedesk</linuxPackageName>
+                            <linuxDebMaintainer>gradedesk@localhost</linuxDebMaintainer>
                         </configuration>
                     </plugin>
                 </plugins>

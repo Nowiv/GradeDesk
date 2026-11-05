@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Einstellungen: Sprache, Speicherort, Datenschutz und Programmangaben. -->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+
+    <top>
+        <HBox styleClass="page-header">
+            <VBox styleClass="page-header__text" HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="%settings.title"/>
+                <Label styleClass="page-subtitle" text="%settings.subtitle"/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox styleClass="page-body">
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="%settings.language.title"/>
+                            <Label styleClass="card__meta" text="%settings.language.subtitle"/>
+                        </VBox>
+                        <VBox fx:id="languageSwitchBox" styleClass="settings__control"/>
+                    </HBox>
+                    <VBox styleClass="card__body">
+                        <Label styleClass="label-muted" text="%settings.language.hint"/>
+                    </VBox>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="%settings.storage.title"/>
+                            <Label styleClass="card__meta" text="%settings.storage.subtitle"/>
+                        </VBox>
+                        <Button fx:id="copyPathButton" styleClass="btn,btn-secondary"
+                                text="%settings.copyPath"/>
+                    </HBox>
+                    <VBox styleClass="card__body">
+                        <Label fx:id="pathLabel" styleClass="label-path" wrapText="true"/>
+                        <Label fx:id="storageDetailLabel" styleClass="label-muted"/>
+                    </VBox>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="%settings.privacy.title"/>
+                            <Label styleClass="card__meta" text="%settings.privacy.meta"/>
+                        </VBox>
+                    </HBox>
+                    <VBox fx:id="privacyBox" styleClass="card__body"/>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="%settings.facts.title"/>
+                            <Label styleClass="card__meta" text="%settings.facts.subtitle"/>
+                        </VBox>
+                    </HBox>
+                    <VBox fx:id="factsBox" styleClass="card__body"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

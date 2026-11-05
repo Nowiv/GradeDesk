@@ -1,0 +1,1145 @@
+/*
+ * Gestaltung von GradeDesk.
+ *
+ * Diese Datei verwendet ausschliesslich die in theme.css definierten Farbnamen.
+ * Im Java- und FXML-Code steht kein Styling: dort werden nur Stilklassen vergeben.
+ */
+
+/* ======================================================================
+ * Grundgerüst
+ * ====================================================================== */
+
+/*
+ * Der Hintergrund ist kein Bild, sondern gestapelte Verläufe: zwei
+ * Lichtschleier über einem tiefen Grundton. Das kostet nichts, skaliert mit
+ * jeder Fenstergrösse und bleibt scharf auf jeder Auflösung.
+ */
+.app-shell {
+    -fx-background-color:
+        radial-gradient(center 18% 8%, radius 62%, -gd-glow-violet, transparent),
+        radial-gradient(center 82% 78%, radius 70%, -gd-glow-blue, transparent),
+        radial-gradient(center 55% 42%, radius 48%, -gd-glow-cyan, transparent),
+        linear-gradient(to bottom right, -gd-bg-deep 0%, -gd-bg 48%, #0d1428 100%);
+}
+
+/* ----------------------------------------------------------------------
+ * Seitenleiste
+ * -------------------------------------------------------------------- */
+
+.sidebar {
+    -fx-background-color: rgba(255, 255, 255, 0.035);
+    -fx-border-color: transparent -gd-border transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-min-width: 248px;
+    -fx-pref-width: 248px;
+    -fx-max-width: 248px;
+    -fx-padding: 26px 16px 18px 16px;
+}
+
+.sidebar__brand {
+    -fx-padding: 0 8px 30px 8px;
+    -fx-spacing: 3px;
+}
+
+/*
+ * Die Wortmarke ist zweifarbig, aber kein Farbverlauf: zwei Labels nebeneinander.
+ * So bleibt sie auch bei hohem Kontrast und in Screenreadern ein Wort.
+ */
+.sidebar__wordmark {
+    -fx-spacing: 0;
+}
+
+.sidebar__wordmark-prefix {
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -gd-text;
+}
+
+.sidebar__wordmark-suffix {
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -gd-accent;
+}
+
+.sidebar__tagline {
+    -fx-font-size: 12px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.sidebar__nav {
+    -fx-spacing: 4px;
+}
+
+.sidebar__footer {
+    -fx-padding: 18px 8px 4px 8px;
+    -fx-spacing: 8px;
+    -fx-border-color: -gd-border transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.sidebar__section-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text-faint;
+    -fx-padding: 6px 0 0 0;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 11px 14px;
+    -fx-graphic-text-gap: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: LEFT;
+    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: -gd-surface;
+    -fx-text-fill: -gd-text;
+}
+
+.nav-button:pressed {
+    -fx-background-color: -gd-surface-strong;
+}
+
+.nav-button:focused {
+    -fx-background-color: -gd-surface;
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+.nav-button .nav-button__icon {
+    -fx-fill: -gd-text-faint;
+}
+
+.nav-button:hover .nav-button__icon {
+    -fx-fill: -gd-text-muted;
+}
+
+/*
+ * Der aktive Eintrag ist eine Pille mit Akzentfüllung und violettem Rand –
+ * dieselbe Figur wie im Vorbild. Die Regeln stehen bewusst nach :focused und
+ * nennen :focused mit, damit die Fokusfüllung sie nicht überschreibt.
+ */
+.nav-button--active,
+.nav-button--active:hover,
+.nav-button--active:focused {
+    -fx-background-color: -gd-accent-wash;
+    -fx-border-color: rgba(139, 92, 246, 0.55);
+    -fx-border-width: 1.5px;
+    -fx-text-fill: -gd-text;
+    -fx-font-weight: 600;
+}
+
+.nav-button--active:focused {
+    -fx-border-color: -gd-accent;
+}
+
+.nav-button--active .nav-button__icon,
+.nav-button--active:hover .nav-button__icon,
+.nav-button--active:focused .nav-button__icon {
+    -fx-fill: -gd-accent-bright;
+}
+
+.save-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: -gd-text-muted;
+    -fx-graphic-text-gap: 8px;
+    -fx-wrap-text: true;
+}
+
+.save-status__dot {
+    -fx-min-width: 7px;
+    -fx-min-height: 7px;
+    -fx-max-width: 7px;
+    -fx-max-height: 7px;
+    -fx-background-radius: 999px;
+    -fx-background-color: -gd-text-faint;
+}
+
+.save-status__dot--saved {
+    -fx-background-color: -gd-success;
+}
+
+.save-status__dot--pending {
+    -fx-background-color: -gd-warning;
+}
+
+.save-status__dot--failed {
+    -fx-background-color: -gd-danger;
+}
+
+.sidebar__path {
+    -fx-font-size: 11px;
+    -fx-text-fill: -gd-text-faint;
+    -fx-wrap-text: true;
+}
+
+/* ----------------------------------------------------------------------
+ * Sprachumschalter
+ * -------------------------------------------------------------------- */
+
+.language-switch {
+    -fx-background-color: -gd-surface-sunken;
+    -fx-background-radius: 10px;
+    -fx-border-color: -gd-border;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
+    -fx-spacing: 3px;
+}
+
+.language-switch__option {
+    -fx-background-color: transparent;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+    -fx-padding: 6px 12px;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -gd-text-muted;
+    -fx-cursor: hand;
+}
+
+.language-switch__option:hover {
+    -fx-background-color: -gd-surface;
+    -fx-text-fill: -gd-text;
+}
+
+.language-switch__option:selected,
+.language-switch__option:selected:hover {
+    -fx-background-color: -gd-accent-wash-strong;
+    -fx-text-fill: -gd-text;
+    -fx-font-weight: 600;
+}
+
+.language-switch__option:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+/* ----------------------------------------------------------------------
+ * Arbeitsfläche und Kopfbereich
+ * -------------------------------------------------------------------- */
+
+.content {
+    -fx-background-color: transparent;
+}
+
+.page-header {
+    -fx-padding: 30px 34px 22px 34px;
+    -fx-spacing: 20px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.page-header__text {
+    -fx-spacing: 5px;
+}
+
+.page-title {
+    -fx-font-size: 27px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text;
+}
+
+.page-subtitle {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -gd-text-muted;
+    -fx-wrap-text: true;
+}
+
+.page-body {
+    -fx-padding: 0 34px 34px 34px;
+    -fx-spacing: 18px;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 2px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.28);
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button,
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-shape: null;
+}
+
+/* ======================================================================
+ * Bausteine
+ * ====================================================================== */
+
+.card {
+    -fx-background-color: -gd-surface;
+    -fx-background-radius: 18px;
+    -fx-border-color: -gd-border;
+    -fx-border-radius: 18px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.38), 26, 0, 0, 8);
+}
+
+.card__header {
+    -fx-padding: 20px 22px 14px 22px;
+    -fx-spacing: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.card__title {
+    -fx-font-size: 17px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text;
+}
+
+.card__meta {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -gd-text-muted;
+}
+
+.card__body {
+    -fx-padding: 0 22px 20px 22px;
+    -fx-spacing: 12px;
+}
+
+.label-micro {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.label-caption {
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -gd-text-muted;
+}
+
+.label-body {
+    -fx-font-size: 14px;
+    -fx-text-fill: -gd-text;
+}
+
+.label-muted {
+    -fx-font-size: 13px;
+    -fx-text-fill: -gd-text-muted;
+    -fx-wrap-text: true;
+}
+
+.label-faint {
+    -fx-font-size: 13px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+/* Ein Dateipfad ist Maschinentext: gleichbreite Ziffern, leicht abgesetzt. */
+.label-path {
+    -fx-font-family: "Cascadia Mono", "Consolas", "SF Mono", "Menlo", "DejaVu Sans Mono", monospace;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -gd-text;
+}
+
+.settings__control {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+/* ----------------------------------------------------------------------
+ * Schaltflächen
+ * -------------------------------------------------------------------- */
+
+.btn {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px 17px;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.btn:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}
+
+.btn-primary {
+    -fx-background-color: -gd-accent;
+    -fx-text-fill: -gd-text-on-accent;
+    -fx-effect: dropshadow(gaussian, rgba(62, 139, 255, 0.35), 16, 0, 0, 4);
+}
+
+.btn-primary:hover {
+    -fx-background-color: -gd-accent-bright;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: -gd-accent-dim;
+}
+
+.btn-primary .icon {
+    -fx-fill: -gd-text-on-accent;
+}
+
+.btn-primary:focused {
+    -fx-background-color: -gd-accent;
+    -fx-border-color: -gd-text;
+    -fx-border-width: 1.5px;
+}
+
+.btn-secondary {
+    -fx-background-color: -gd-surface-strong;
+    -fx-text-fill: -gd-text;
+    -fx-border-color: -gd-border-strong;
+    -fx-border-width: 1px;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -gd-surface-hover;
+    -fx-border-color: -gd-accent;
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: -gd-surface-sunken;
+}
+
+.btn-secondary .icon {
+    -fx-fill: -gd-text-muted;
+}
+
+.btn-secondary:hover .icon {
+    -fx-fill: -gd-accent-bright;
+}
+
+.btn-secondary:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -gd-text-muted;
+    -fx-font-weight: 500;
+    -fx-padding: 8px 12px;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: -gd-surface;
+    -fx-text-fill: -gd-text;
+}
+
+.btn-ghost:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+.btn-danger {
+    -fx-background-color: -gd-danger-wash;
+    -fx-text-fill: -gd-danger;
+    -fx-border-color: rgba(255, 93, 93, 0.4);
+    -fx-border-width: 1px;
+}
+
+.btn-danger:hover {
+    -fx-background-color: rgba(255, 93, 93, 0.24);
+    -fx-border-color: -gd-danger;
+}
+
+.btn-danger:focused {
+    -fx-border-color: -gd-danger;
+    -fx-border-width: 1.5px;
+}
+
+.btn-quiet-icon {
+    -fx-background-color: transparent;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-padding: 6px;
+    -fx-cursor: hand;
+}
+
+.btn-quiet-icon:hover {
+    -fx-background-color: -gd-surface-strong;
+}
+
+.btn-quiet-icon:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+.btn-quiet-icon:disabled {
+    -fx-opacity: 0.3;
+}
+
+.btn-quiet-icon .icon {
+    -fx-fill: -gd-text-faint;
+}
+
+.btn-quiet-icon:hover .icon {
+    -fx-fill: -gd-text;
+}
+
+.btn-quiet-icon--danger:hover .icon {
+    -fx-fill: -gd-danger;
+}
+
+/* ----------------------------------------------------------------------
+ * Eingabefelder
+ * -------------------------------------------------------------------- */
+
+.text-field,
+.date-picker > .text-field,
+.combo-box-base {
+    -fx-background-color: -gd-surface-sunken;
+    -fx-background-radius: 10px;
+    -fx-border-color: -gd-border-strong;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 9px 11px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -gd-text;
+    -fx-prompt-text-fill: -gd-text-faint;
+    -fx-highlight-fill: -gd-accent-wash-strong;
+    -fx-highlight-text-fill: -gd-text;
+}
+
+.text-field:focused,
+.date-picker:focused > .text-field,
+.combo-box-base:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+}
+
+.text-field--invalid,
+.text-field--invalid:focused,
+.date-picker.text-field--invalid > .text-field {
+    -fx-border-color: -gd-danger;
+    -fx-border-width: 1.5px;
+}
+
+.date-picker {
+    -fx-background-color: transparent;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 9px 11px;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: -gd-text-muted;
+}
+
+.date-picker-popup {
+    -fx-background-color: -gd-bg-raised;
+    -fx-border-color: -gd-border;
+    -fx-border-width: 1px;
+}
+
+.date-picker-popup > * > .month-year-pane {
+    -fx-background-color: -gd-surface;
+}
+
+.date-picker-popup > * > .month-year-pane .label {
+    -fx-text-fill: -gd-text;
+}
+
+.date-picker-popup > * > .month-year-pane .button > .left-arrow,
+.date-picker-popup > * > .month-year-pane .button > .right-arrow {
+    -fx-background-color: -gd-text-muted;
+}
+
+.date-picker-popup > * > .calendar-grid {
+    -fx-background-color: -gd-bg-raised;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-name-cell,
+.date-picker-popup > * > .calendar-grid > .week-number-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -gd-text;
+    -fx-border-color: transparent;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-cell:hover {
+    -fx-background-color: -gd-surface-strong;
+}
+
+.date-picker-popup > * > .calendar-grid > .selected {
+    -fx-background-color: -gd-accent;
+    -fx-text-fill: -gd-text-on-accent;
+}
+
+.date-picker-popup > * > .calendar-grid > .today {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1px;
+}
+
+.date-picker-popup > * > .calendar-grid > .next-month,
+.date-picker-popup > * > .calendar-grid > .previous-month {
+    -fx-text-fill: -gd-text-faint;
+}
+
+.field-label {
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text-muted;
+}
+
+.field-hint {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.field-error {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -gd-danger;
+    -fx-wrap-text: true;
+}
+
+/* ----------------------------------------------------------------------
+ * Notenband – der wiederkehrende Massstab 1 bis 6
+ * -------------------------------------------------------------------- */
+
+.grade-track {
+    -fx-min-height: 18px;
+    -fx-pref-height: 18px;
+    -fx-max-height: 18px;
+}
+
+.grade-track__rail {
+    -fx-background-color: -gd-surface-sunken;
+    -fx-background-radius: 999px;
+    -fx-border-color: -gd-border;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.grade-track__fill {
+    -fx-background-radius: 999px;
+}
+
+.grade-track__tick {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+}
+
+.grade-track__threshold {
+    -fx-background-color: -gd-chart-threshold;
+    -fx-background-radius: 1px;
+    -fx-opacity: 0.8;
+}
+
+.grade-track__marker {
+    -fx-background-radius: 999px;
+    -fx-border-color: -gd-bg;
+    -fx-border-radius: 999px;
+    -fx-border-width: 2px;
+}
+
+/* Notenfarben als Füllung */
+.grade-fill--insufficient { -fx-background-color: -gd-grade-insufficient; }
+.grade-fill--40 { -fx-background-color: -gd-grade-40; }
+.grade-fill--45 { -fx-background-color: -gd-grade-45; }
+.grade-fill--50 { -fx-background-color: -gd-grade-50; }
+.grade-fill--55 { -fx-background-color: -gd-grade-55; }
+.grade-fill--60 { -fx-background-color: -gd-grade-60; }
+
+/* ----------------------------------------------------------------------
+ * Noten-Darstellung in Listen
+ * -------------------------------------------------------------------- */
+
+.grade-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text;
+}
+
+.grade-value--none {
+    -fx-text-fill: -gd-text-faint;
+}
+
+.grade-exact {
+    -fx-font-size: 12px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.badge {
+    -fx-background-radius: 999px;
+    -fx-padding: 4px 11px;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 600;
+}
+
+.badge--ok {
+    -fx-background-color: rgba(79, 202, 132, 0.16);
+    -fx-text-fill: #7fe0a8;
+}
+
+.badge--fail {
+    -fx-background-color: -gd-danger-wash;
+    -fx-text-fill: #ff8b8b;
+}
+
+.badge--none {
+    -fx-background-color: -gd-surface-sunken;
+    -fx-text-fill: -gd-text-faint;
+    -fx-border-color: -gd-border;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+/* ----------------------------------------------------------------------
+ * Modulzeile in der Übersicht
+ * -------------------------------------------------------------------- */
+
+.module-row {
+    -fx-padding: 14px 22px;
+    -fx-spacing: 18px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-background-color: transparent;
+    -fx-border-color: -gd-border transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.module-row:hover {
+    -fx-background-color: -gd-surface;
+}
+
+.module-row__name {
+    -fx-font-size: 14.5px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -gd-text;
+}
+
+.module-row__count {
+    -fx-font-size: 12px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.module-summary {
+    -fx-padding: 0 22px 16px 22px;
+    -fx-spacing: 18px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* ----------------------------------------------------------------------
+ * Listen und Tabellen
+ * -------------------------------------------------------------------- */
+
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-text-fill: -gd-text;
+}
+
+.picker-cell {
+    -fx-padding: 11px 13px;
+    -fx-spacing: 3px;
+    -fx-background-radius: 11px;
+    -fx-border-radius: 11px;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.picker-cell:hover {
+    -fx-background-color: -gd-surface;
+}
+
+.picker-cell--selected,
+.picker-cell--selected:hover {
+    -fx-background-color: -gd-accent-wash;
+    -fx-border-color: rgba(139, 92, 246, 0.45);
+    -fx-border-width: 1px;
+}
+
+.picker-cell__title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -gd-text;
+}
+
+.picker-cell--selected .picker-cell__title {
+    -fx-text-fill: -gd-accent-bright;
+    -fx-font-weight: 600;
+}
+
+.picker-cell__meta {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -gd-text-faint;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view > .virtual-flow > .corner {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -gd-border transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-padding: 0 8px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text-faint;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -gd-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cell-size: 46px;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: -gd-surface;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: -gd-accent-wash;
+}
+
+/* Leere Zeilen unterhalb der Daten bekommen keine Trennlinie. */
+.table-view .table-row-cell:empty,
+.table-view .table-row-cell:empty:hover {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .table-cell {
+    -fx-padding: 0 8px;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -gd-text;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: -gd-text;
+}
+
+.table-view .table-cell.table-cell--numeric {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.table-view .column-header.table-cell--numeric .label {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.table-view:focused {
+    -fx-border-color: -gd-accent;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 10px;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 13px;
+}
+
+/* ----------------------------------------------------------------------
+ * Leere Zustände und Hinweise
+ * -------------------------------------------------------------------- */
+
+.empty-state {
+    -fx-padding: 54px 32px;
+    -fx-spacing: 12px;
+    -fx-alignment: CENTER;
+}
+
+.empty-state--compact {
+    -fx-padding: 30px 22px;
+}
+
+.empty-state__title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text;
+}
+
+.empty-state__text {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -gd-text-muted;
+    -fx-wrap-text: true;
+    -fx-text-alignment: CENTER;
+    -fx-max-width: 460px;
+}
+
+.empty-state__action {
+    -fx-padding: 10px 0 0 0;
+}
+
+/*
+ * Das Symbol im leeren Zustand sitzt auf einer abgerundeten Akzentkachel –
+ * dieselbe Figur, die im Vorbild die Kurse markiert.
+ */
+.empty-state__mark {
+    -fx-background-color: -gd-accent-wash;
+    -fx-background-radius: 16px;
+    -fx-border-color: rgba(62, 139, 255, 0.3);
+    -fx-border-radius: 16px;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+    -fx-max-width: -Infinity;
+    -fx-max-height: -Infinity;
+}
+
+.empty-state__mark .icon {
+    -fx-fill: -gd-accent-bright;
+}
+
+.banner {
+    -fx-background-radius: 12px;
+    -fx-padding: 13px 17px;
+    -fx-spacing: 12px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.banner--warning {
+    -fx-background-color: -gd-warning-wash;
+    -fx-border-color: rgba(251, 191, 75, 0.35);
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.banner__text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #f8d9a0;
+    -fx-wrap-text: true;
+}
+
+.banner--warning .icon {
+    -fx-fill: -gd-warning;
+}
+
+.icon--alert {
+    -fx-fill: -gd-warning;
+}
+
+/* ======================================================================
+ * Diagramm
+ * ====================================================================== */
+
+.grade-chart-container {
+    -fx-padding: 20px 22px 6px 22px;
+}
+
+.grade-chart {
+    -fx-padding: 0;
+}
+
+.grade-chart .chart-plot-background {
+    -fx-background-color: -gd-chart-plot;
+}
+
+.grade-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.grade-chart .chart-horizontal-grid-lines {
+    -fx-stroke: -gd-chart-grid;
+    -fx-stroke-width: 1px;
+}
+
+.grade-chart .chart-alternative-row-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+.grade-chart .axis {
+    -fx-tick-label-fill: -gd-text-muted;
+    -fx-tick-label-font-size: 11.5px;
+    -fx-tick-mark-visible: false;
+    -fx-minor-tick-visible: false;
+}
+
+.grade-chart .axis:left {
+    -fx-tick-label-font-size: 12px;
+}
+
+.grade-chart .axis .axis-label {
+    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 600;
+}
+
+.grade-chart .chart-bar {
+    -fx-bar-fill: -gd-grade-50;
+    -fx-background-radius: 8px 8px 2px 2px;
+    -fx-background-insets: 0;
+}
+
+.grade-chart .chart-bar.bar--insufficient { -fx-bar-fill: -gd-grade-insufficient; }
+.grade-chart .chart-bar.bar--40 { -fx-bar-fill: -gd-grade-40; }
+.grade-chart .chart-bar.bar--45 { -fx-bar-fill: -gd-grade-45; }
+.grade-chart .chart-bar.bar--50 { -fx-bar-fill: -gd-grade-50; }
+.grade-chart .chart-bar.bar--55 { -fx-bar-fill: -gd-grade-55; }
+.grade-chart .chart-bar.bar--60 { -fx-bar-fill: -gd-grade-60; }
+
+.chart-threshold-line {
+    -fx-stroke: -gd-chart-threshold;
+    -fx-stroke-width: 1.5px;
+}
+
+.chart-semester-divider {
+    -fx-stroke: -gd-border-strong;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 3 4;
+}
+
+.chart-semester-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-fill: -gd-text-muted;
+}
+
+.chart-threshold-caption {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 600;
+    -fx-fill: -gd-chart-threshold;
+}
+
+/*
+ * Achtung: ".chart-legend" ist von JavaFX selbst belegt – modena gibt dieser
+ * Klasse einen hellen Hintergrund. Deshalb hier ein eigener Name.
+ */
+.chart-legend-bar {
+    -fx-padding: 4px 22px 20px 22px;
+    -fx-background-color: transparent;
+}
+
+.chart-legend-swatch {
+    -fx-min-width: 14px;
+    -fx-min-height: 14px;
+    -fx-max-width: 14px;
+    -fx-max-height: 14px;
+    -fx-background-radius: 5px;
+}
+
+.chart-legend-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -gd-text-muted;
+}
+
+/* ======================================================================
+ * Dialoge
+ * ====================================================================== */
+
+.dialog-pane {
+    -fx-background-color: -gd-bg-raised;
+    -fx-padding: 4px;
+    -fx-border-color: -gd-border;
+    -fx-border-width: 1px;
+}
+
+.dialog-pane > .header-panel {
+    -fx-background-color: -gd-bg-raised;
+    -fx-padding: 22px 26px 4px 26px;
+}
+
+.dialog-pane > .header-panel > .label {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -gd-text;
+    -fx-wrap-text: true;
+}
+
+.dialog-pane > .content,
+.dialog-pane > .content.label {
+    -fx-background-color: -gd-bg-raised;
+    -fx-padding: 10px 26px 18px 26px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -gd-text-muted;
+    -fx-wrap-text: true;
+}
+
+.dialog-pane > .button-bar {
+    -fx-background-color: -gd-bg-raised;
+    -fx-padding: 8px 22px 20px 22px;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-spacing: 10px;
+}
+
+.dialog-form {
+    -fx-spacing: 16px;
+    -fx-padding: 4px 0 4px 0;
+}
+
+.dialog-form__field {
+    -fx-spacing: 6px;
+}
+
+.dialog-form__row {
+    -fx-spacing: 16px;
+}
+
+/* ======================================================================
+ * Hilfselemente
+ * ====================================================================== */
+
+.tooltip {
+    -fx-background-color: -gd-bg-raised;
+    -fx-background-radius: 8px;
+    -fx-border-color: -gd-border-strong;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: -gd-text;
+    -fx-font-size: 12.5px;
+    -fx-padding: 8px 11px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 14, 0, 0, 4);
+}
+
+.icon {
+    -fx-fill: -gd-text-muted;
+}
