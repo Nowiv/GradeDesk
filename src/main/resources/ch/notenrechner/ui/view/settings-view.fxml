@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Einstellungen: Speicherort, Datenschutz und Programmangaben. -->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+
+    <top>
+        <HBox styleClass="page-header">
+            <VBox styleClass="page-header__text" HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="Einstellungen"/>
+                <Label styleClass="page-subtitle"
+                       text="Wo die Daten liegen, was gespeichert wird und was nicht."/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox styleClass="page-body">
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="Speicherort"/>
+                            <Label styleClass="card__meta"
+                                   text="Im Benutzerprofil, damit die Noten ein Update überstehen."/>
+                        </VBox>
+                        <Button fx:id="copyPathButton" styleClass="btn,btn-secondary" text="Pfad kopieren"/>
+                    </HBox>
+                    <VBox styleClass="card__body">
+                        <Label fx:id="pathLabel" styleClass="label-body" wrapText="true"/>
+                        <Label fx:id="storageDetailLabel" styleClass="label-muted"/>
+                    </VBox>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="Datenschutz"/>
+                            <Label fx:id="privacyMetaLabel" styleClass="card__meta"/>
+                        </VBox>
+                    </HBox>
+                    <VBox fx:id="privacyBox" styleClass="card__body"/>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="Daten und Programm"/>
+                            <Label styleClass="card__meta" text="Aktueller Stand dieser Installation."/>
+                        </VBox>
+                    </HBox>
+                    <VBox fx:id="factsBox" styleClass="card__body"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

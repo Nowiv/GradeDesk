@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Grundgerüst der Anwendung: rote Seitenleiste links, Arbeitsfläche rechts.
+  Die Navigationseinträge entstehen zur Laufzeit aus ch.notenrechner.ui.Views,
+  damit eine zusätzliche Ansicht keinen Eingriff in diese Datei braucht.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ch.notenrechner.ui.MainController"
+            styleClass="app-shell">
+
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar__brand">
+                <Label styleClass="sidebar__wordmark" text="Notenrechner"/>
+                <Label styleClass="sidebar__tagline" text="Noten erfassen und auswerten"/>
+            </VBox>
+
+            <VBox fx:id="navigationBox" styleClass="sidebar__nav"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <VBox styleClass="sidebar__footer">
+                <Label fx:id="saveStatusLabel" styleClass="save-status" text="Bereit"/>
+                <Label fx:id="locationLabel" styleClass="sidebar__path"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox styleClass="content">
+            <HBox fx:id="alertBanner" managed="false" styleClass="banner,banner--warning"
+                  visible="false">
+                <Label fx:id="alertBannerLabel" styleClass="banner__text" HBox.hgrow="ALWAYS"/>
+                <VBox.margin>
+                    <Insets top="20.0" right="32.0" bottom="0.0" left="32.0"/>
+                </VBox.margin>
+            </HBox>
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+
+</BorderPane>
