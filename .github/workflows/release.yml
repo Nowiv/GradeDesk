@@ -1,16 +1,10 @@
-
 name: Release
 
 # Builds native installers for Windows, macOS and Linux
-# whenever a version tag (e.g. v1.0.0) is pushed.
+# whenever a version tag (e.g. v1.2.3) is pushed.
 #
 # Each installer includes its own Java runtime created with jlink.
-# Users do not need to install Java separately.
-#
-# Runner images are pinned on purpose: the "-latest" labels move to new
-# operating system versions without notice (ubuntu-latest is currently
-# migrating to Ubuntu 26.04), which would change the build environment
-# of a release build underneath us.
+# Runner images are pinned to avoid unexpected OS changes.
 
 on:
   push:
@@ -56,30 +50,53 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Derive Maven version from Git tag
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="0.0.0"
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release version: $VERSION" >&2
+            exit 1
+          fi
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building GradeDesk version $VERSION"
+
       - name: Provide WiX 3 for jpackage
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # jpackage on JDK 21 builds MSI packages with candle.exe and
-          # light.exe, which only exist in WiX 3.x. The windows-2025 image
-          # ships WiX 3.14, so install it only if it is ever missing, and
-          # always put the resolved directory on PATH for the later steps.
-          $bin = (Get-ChildItem 'C:\Program Files (x86)\WiX Toolset v3*\bin\candle.exe' -ErrorAction SilentlyContinue |
-                  Select-Object -First 1).DirectoryName
-          if (-not $bin) {
-            choco install wixtoolset --version 3.14.1.20250415 --no-progress -y
-            $bin = (Get-ChildItem 'C:\Program Files (x86)\WiX Toolset v3*\bin\candle.exe' |
-                    Select-Object -First 1).DirectoryName
+          # JDK 21 jpackage requires the WiX 3.x tools candle.exe and light.exe.
+          # Prefer the known WiX 3 installation path; install a pinned fallback
+          # only if the tools are not already available.
+          $candidate = 'C:\Program Files (x86)\WiX Toolset v3.14\bin'
+          if (-not (Test-Path (Join-Path $candidate 'candle.exe')) -or
+              -not (Test-Path (Join-Path $candidate 'light.exe'))) {
+            choco install wixtoolset --version=3.14.1.20250415 --no-progress --yes
           }
-          Write-Host "Using WiX from $bin"
+
+          $wixRoot = 'C:\Program Files (x86)\WiX Toolset v3.14'
+          $bin = Join-Path $wixRoot 'bin'
+          $candle = Join-Path $bin 'candle.exe'
+          $light = Join-Path $bin 'light.exe'
+
+          if (-not (Test-Path $candle) -or -not (Test-Path $light)) {
+            throw "WiX 3.14 was not found at the expected location: $bin"
+          }
+
+          Write-Host "Using WiX 3 from $bin"
           $bin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
       - name: Run tests
-        run: ./mvnw --batch-mode verify
+        run: ./mvnw --batch-mode -Drevision=${{ steps.version.outputs.value }} verify
         shell: bash
 
       - name: Build installer
-        run: ./mvnw --batch-mode -Pinstaller -DskipTests package
+        run: ./mvnw --batch-mode -Drevision=${{ steps.version.outputs.value }} -Pinstaller -DskipTests package
         shell: bash
 
       - name: Upload installer
@@ -102,10 +119,23 @@ jobs:
           path: installer
           merge-multiple: true
 
+      - name: Generate SHA-256 checksums
+        shell: bash
+        run: |
+          cd installer
+          find . -maxdepth 1 -type f \( -name '*.msi' -o -name '*.dmg' -o -name '*.deb' \) -print0 \
+            | sort -z \
+            | xargs -0 -r sha256sum > SHA256SUMS.txt
+          test -s SHA256SUMS.txt
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: installer/*
+          files: |
+            installer/*.msi
+            installer/*.dmg
+            installer/*.deb
+            installer/SHA256SUMS.txt
           draft: false
           generate_release_notes: true
           body: |
@@ -113,6 +143,8 @@ jobs:
 
             Each installer includes its own Java runtime.
             No separate Java installation is required.
+
+            SHA-256 checksums are provided in SHA256SUMS.txt.
 
             **Note:** The installers are currently unsigned.
             Windows may display a SmartScreen warning, while macOS

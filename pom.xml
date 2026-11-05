@@ -7,13 +7,17 @@
 
     <groupId>ch.gradedesk</groupId>
     <artifactId>gradedesk</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <name>GradeDesk</name>
     <description>Local desktop application for recording and analyzing school grades using the Swiss grading scale (1-6).</description>
 
     <properties>
+        <!-- CI-friendly version: der Release-Workflow baut mit -Drevision=<Tag ohne v>.
+             jpackage uebernimmt den Wert ueber appVersion=${project.version}. -->
+        <revision>1.0.0</revision>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>21</maven.compiler.release>
