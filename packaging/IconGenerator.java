@@ -33,11 +33,8 @@ import java.util.List;
  */
 public final class IconGenerator {
 
-    private static final Color BG_TOP = new Color(0x16, 0x1F, 0x3D);
-    private static final Color BG_BOTTOM = new Color(0x07, 0x0B, 0x18);
-    private static final Color ACCENT = new Color(0x3E, 0x8B, 0xFF);
-    private static final Color ACCENT_BRIGHT = new Color(0x6F, 0xB2, 0xFF);
-    private static final Color VIOLET = new Color(0x8B, 0x5C, 0xF6);
+    private static final Color BG_TOP = new Color(0x4D, 0xA3, 0xFF);
+    private static final Color BG_BOTTOM = new Color(0x58, 0x56, 0xD6);
     private static final Color WHITE = Color.WHITE;
 
     public static void main(String[] args) throws IOException {
@@ -76,17 +73,17 @@ public final class IconGenerator {
         g.setPaint(new GradientPaint(0, 0, BG_TOP, (float) s, (float) s, BG_BOTTOM));
         g.fill(tile);
 
-        // Ein blauer Lichtschein unten rechts, derselbe Gedanke wie im Fenster.
+        // Ein weicher Lichtschein oben links â das Licht faellt in Apples Symbolen von oben.
         Shape clip = g.getClip();
         g.setClip(tile);
         g.setPaint(new RadialGradientPaint(
-                new Point2D.Double(s * 0.82, s * 0.86), (float) (s * 0.72),
+                new Point2D.Double(s * 0.28, s * 0.16), (float) (s * 0.78),
                 new float[] {0f, 1f},
-                new Color[] {new Color(0x3E, 0x8B, 0xFF, 95), new Color(0x3E, 0x8B, 0xFF, 0)}));
+                new Color[] {new Color(255, 255, 255, 90), new Color(255, 255, 255, 0)}));
         g.fill(tile);
         g.setClip(clip);
 
-        // Dezenter heller Rand, damit die Kachel auf dunklem Grund nicht verschwimmt.
+        // Dezenter heller Rand als Abschluss der Kachel.
         g.setPaint(new Color(255, 255, 255, 46));
         g.setStroke(new BasicStroke((float) Math.max(1, s * 0.008)));
         double inset = s * 0.012;
@@ -100,7 +97,7 @@ public final class IconGenerator {
         double left = (s - totalWidth) / 2.0;
         double baseline = s * 0.775;
         double[] heights = {s * 0.22, s * 0.355, s * 0.49};
-        Color[] barColors = {ACCENT, ACCENT_BRIGHT, VIOLET};
+        Color[] barColors = {new Color(255, 255, 255, 185), new Color(255, 255, 255, 220), WHITE};
         double barRadius = barWidth * 0.42;
 
         for (int i = 0; i < 3; i++) {

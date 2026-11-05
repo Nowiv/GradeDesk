@@ -1,154 +1,174 @@
 /*
- * Gestaltung von GradeDesk.
+ * Gestaltung von GradeDesk nach Apples Human Interface Guidelines.
  *
- * Diese Datei verwendet ausschliesslich die in theme.css definierten Farbnamen.
- * Im Java- und FXML-Code steht kein Styling: dort werden nur Stilklassen vergeben.
+ * Leitlinien, die hier konsequent angewandt sind:
+ *
+ *   1. Liquid Glass gehoert auf die Navigationsebene, nicht auf den Inhalt.
+ *      Glas traegt die Seitenleiste und schwebende Bedienelemente. Listen und
+ *      Karten sind flach und undurchsichtig – Glas auf Glas oder Glas auf
+ *      Inhalt wuerde genau die Hierarchie einebnen, die das Material
+ *      erzeugen soll.
+ *   2. Konzentrische Radien: der innere Radius ist der aeussere minus dem
+ *      Abstand dazwischen. Sonst laufen die Kurven sichtbar auseinander.
+ *   3. Beruehrungs- und Klickflaechen mindestens 44 px.
+ *   4. Farbe traegt nie allein eine Aussage; neben jeder Notenfarbe steht die
+ *      Zahl und ein Wort.
+ *
+ * Alle Farben kommen aus theme.css. Im Java- und FXML-Code steht kein Styling.
  */
 
 /* ======================================================================
- * Grundgerüst
+ * Flaeche der Anwendung
  * ====================================================================== */
 
 /*
- * Der Hintergrund ist kein Bild, sondern gestapelte Verläufe: zwei
- * Lichtschleier über einem tiefen Grundton. Das kostet nichts, skaliert mit
- * jeder Fenstergrösse und bleibt scharf auf jeder Auflösung.
+ * Liquid Glass nimmt die Farbe dessen auf, was dahinter liegt. Ein ruhiger
+ * farbiger Verlauf gibt dem Material etwas zum Aufnehmen, ohne mit dem Inhalt
+ * zu konkurrieren. Gestapelte Radialverlaeufe statt eines Bildes: scharf auf
+ * jeder Aufloesung und ohne Datei.
  */
 .app-shell {
     -fx-background-color:
-        radial-gradient(center 18% 8%, radius 62%, -gd-glow-violet, transparent),
-        radial-gradient(center 82% 78%, radius 70%, -gd-glow-blue, transparent),
-        radial-gradient(center 55% 42%, radius 48%, -gd-glow-cyan, transparent),
-        linear-gradient(to bottom right, -gd-bg-deep 0%, -gd-bg 48%, #0d1428 100%);
+        radial-gradient(center 14% 6%, radius 58%, -ios-canvas-tint-indigo, transparent),
+        radial-gradient(center 88% 82%, radius 66%, -ios-canvas-tint-blue, transparent),
+        radial-gradient(center 58% 46%, radius 44%, -ios-canvas-tint-teal, transparent),
+        linear-gradient(to bottom right, -ios-canvas-1 0%, -ios-canvas-2 100%);
 }
 
 /* ----------------------------------------------------------------------
- * Seitenleiste
+ * Liquid Glass
+ *
+ * JavaFX kennt keinen Filter, der den Hintergrund hinter einem Knoten
+ * weichzeichnet. Nachgebildet wird das Material deshalb aus drei Lagen:
+ * einer durchscheinenden Fuellung, die die Farbe des Untergrunds durchlaesst,
+ * einem schmalen Lichtband an der Oberkante als Spiegelglanz, und einem
+ * hellen Rand ringsum. Weil der Untergrund ein weicher Verlauf ist, faellt
+ * das fehlende Weichzeichnen nicht auf – es gaebe nichts zu zerstreuen.
  * -------------------------------------------------------------------- */
 
+.sidebar-dock {
+    -fx-padding: 16px 0 16px 16px;
+}
+
 .sidebar {
-    -fx-background-color: rgba(255, 255, 255, 0.035);
-    -fx-border-color: transparent -gd-border transparent transparent;
-    -fx-border-width: 0 1px 0 0;
-    -fx-min-width: 248px;
-    -fx-pref-width: 248px;
-    -fx-max-width: 248px;
-    -fx-padding: 26px 16px 18px 16px;
+    -fx-background-color:
+        linear-gradient(to bottom, -ios-glass-specular 0%, transparent 4%),
+        -ios-glass-fill;
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 26px, 26px;
+    -fx-border-color: -ios-glass-edge;
+    -fx-border-width: 1px;
+    -fx-border-radius: 26px;
+    -fx-effect: dropshadow(gaussian, -ios-glass-shadow, 30, 0, 0, 12);
+    -fx-min-width: 252px;
+    -fx-pref-width: 252px;
+    -fx-max-width: 252px;
+    /* 26 aussen minus 12 Abstand ergibt 14 innen – konzentrisch. */
+    -fx-padding: 22px 12px 14px 12px;
 }
 
 .sidebar__brand {
-    -fx-padding: 0 8px 30px 8px;
-    -fx-spacing: 3px;
+    -fx-padding: 4px 10px 22px 10px;
+    -fx-spacing: 1px;
 }
 
-/*
- * Die Wortmarke ist zweifarbig, aber kein Farbverlauf: zwei Labels nebeneinander.
- * So bleibt sie auch bei hohem Kontrast und in Screenreadern ein Wort.
- */
 .sidebar__wordmark {
     -fx-spacing: 0;
 }
 
 .sidebar__wordmark-prefix {
-    -fx-font-size: 22px;
-    -fx-font-weight: 700;
-    -fx-text-fill: -gd-text;
+    -fx-font-family: "Inter Display", "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -ios-label;
 }
 
 .sidebar__wordmark-suffix {
-    -fx-font-size: 22px;
-    -fx-font-weight: 700;
-    -fx-text-fill: -gd-accent;
+    -fx-font-family: "Inter Display", "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -ios-blue;
 }
 
 .sidebar__tagline {
-    -fx-font-size: 12px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .sidebar__nav {
-    -fx-spacing: 4px;
+    -fx-spacing: 3px;
 }
 
 .sidebar__footer {
-    -fx-padding: 18px 8px 4px 8px;
-    -fx-spacing: 8px;
-    -fx-border-color: -gd-border transparent transparent transparent;
+    -fx-padding: 16px 6px 2px 6px;
+    -fx-spacing: 9px;
+    -fx-border-color: -ios-separator transparent transparent transparent;
     -fx-border-width: 1px 0 0 0;
 }
 
 .sidebar__section-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text-faint;
-    -fx-padding: 6px 0 0 0;
+    -fx-text-fill: -ios-label-tertiary;
+    -fx-padding: 8px 0 0 0;
 }
 
+/* Navigationszeile: 44 px hoch, Auswahl als gefuellte Kapsel. */
 .nav-button {
     -fx-background-color: transparent;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-padding: 11px 14px;
-    -fx-graphic-text-gap: 13px;
+    -fx-min-height: 44px;
+    -fx-padding: 0 12px;
+    -fx-graphic-text-gap: 12px;
     -fx-alignment: CENTER_LEFT;
     -fx-content-display: LEFT;
-    -fx-text-fill: -gd-text-muted;
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
+    -fx-text-fill: -ios-label;
+    -fx-font-size: 15px;
     -fx-cursor: hand;
 }
 
 .nav-button:hover {
-    -fx-background-color: -gd-surface;
-    -fx-text-fill: -gd-text;
+    -fx-background-color: -ios-fill-quaternary;
 }
 
 .nav-button:pressed {
-    -fx-background-color: -gd-surface-strong;
+    -fx-background-color: -ios-fill-tertiary;
 }
 
 .nav-button:focused {
-    -fx-background-color: -gd-surface;
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+    -fx-background-color: -ios-fill-quaternary;
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
 }
 
 .nav-button .nav-button__icon {
-    -fx-fill: -gd-text-faint;
+    -fx-stroke: -ios-label-secondary;
 }
 
-.nav-button:hover .nav-button__icon {
-    -fx-fill: -gd-text-muted;
-}
-
-/*
- * Der aktive Eintrag ist eine Pille mit Akzentfüllung und violettem Rand –
- * dieselbe Figur wie im Vorbild. Die Regeln stehen bewusst nach :focused und
- * nennen :focused mit, damit die Fokusfüllung sie nicht überschreibt.
- */
 .nav-button--active,
 .nav-button--active:hover,
 .nav-button--active:focused {
-    -fx-background-color: -gd-accent-wash;
-    -fx-border-color: rgba(139, 92, 246, 0.55);
-    -fx-border-width: 1.5px;
-    -fx-text-fill: -gd-text;
+    -fx-background-color: -ios-blue;
+    -fx-text-fill: -ios-label-on-accent;
     -fx-font-weight: 600;
+    -fx-border-color: transparent;
 }
 
 .nav-button--active:focused {
-    -fx-border-color: -gd-accent;
+    -fx-border-color: -ios-label;
+    -fx-border-width: 2px;
 }
 
 .nav-button--active .nav-button__icon,
 .nav-button--active:hover .nav-button__icon,
 .nav-button--active:focused .nav-button__icon {
-    -fx-fill: -gd-accent-bright;
+    -fx-stroke: -ios-label-on-accent;
 }
 
 .save-status {
-    -fx-font-size: 12px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -ios-label-secondary;
     -fx-graphic-text-gap: 8px;
     -fx-wrap-text: true;
 }
@@ -159,71 +179,66 @@
     -fx-max-width: 7px;
     -fx-max-height: 7px;
     -fx-background-radius: 999px;
-    -fx-background-color: -gd-text-faint;
+    -fx-background-color: -ios-label-quaternary;
 }
 
-.save-status__dot--saved {
-    -fx-background-color: -gd-success;
-}
-
-.save-status__dot--pending {
-    -fx-background-color: -gd-warning;
-}
-
-.save-status__dot--failed {
-    -fx-background-color: -gd-danger;
-}
+.save-status__dot--saved { -fx-background-color: -ios-green; }
+.save-status__dot--pending { -fx-background-color: -ios-orange; }
+.save-status__dot--failed { -fx-background-color: -ios-red; }
 
 .sidebar__path {
-    -fx-font-size: 11px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -ios-label-tertiary;
     -fx-wrap-text: true;
 }
 
 /* ----------------------------------------------------------------------
- * Sprachumschalter
+ * Segmentiertes Bedienelement
  * -------------------------------------------------------------------- */
 
-.language-switch {
-    -fx-background-color: -gd-surface-sunken;
+.segmented {
+    -fx-background-color: -ios-fill-tertiary;
     -fx-background-radius: 10px;
-    -fx-border-color: -gd-border;
-    -fx-border-radius: 10px;
-    -fx-border-width: 1px;
-    -fx-padding: 3px;
-    -fx-spacing: 3px;
+    -fx-padding: 2px;
+    -fx-spacing: 2px;
 }
 
-.language-switch__option {
+.segmented__option {
     -fx-background-color: transparent;
-    -fx-background-radius: 7px;
-    -fx-border-radius: 7px;
-    -fx-padding: 6px 12px;
-    -fx-font-size: 12.5px;
+    /* 10 aussen minus 2 Abstand ergibt 8 innen. */
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-min-height: 30px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: 500;
-    -fx-text-fill: -gd-text-muted;
+    -fx-text-fill: -ios-label;
     -fx-cursor: hand;
 }
 
-.language-switch__option:hover {
-    -fx-background-color: -gd-surface;
-    -fx-text-fill: -gd-text;
+.segmented__option:hover {
+    -fx-background-color: -ios-fill-quaternary;
 }
 
-.language-switch__option:selected,
-.language-switch__option:selected:hover {
-    -fx-background-color: -gd-accent-wash-strong;
-    -fx-text-fill: -gd-text;
+.segmented__option:selected,
+.segmented__option:selected:hover {
+    -fx-background-color:
+        linear-gradient(to bottom, -ios-glass-specular 0%, transparent 12%),
+        -ios-glass-fill-strong;
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8px, 8px;
+    -fx-text-fill: -ios-label;
     -fx-font-weight: 600;
+    -fx-effect: dropshadow(gaussian, -ios-glass-shadow, 6, 0, 0, 1);
 }
 
-.language-switch__option:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+.segmented__option:focused {
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
 }
 
 /* ----------------------------------------------------------------------
- * Arbeitsfläche und Kopfbereich
+ * Arbeitsflaeche, grosse Titel
  * -------------------------------------------------------------------- */
 
 .content {
@@ -231,30 +246,32 @@
 }
 
 .page-header {
-    -fx-padding: 30px 34px 22px 34px;
+    -fx-padding: 26px 32px 18px 32px;
     -fx-spacing: 20px;
     -fx-alignment: CENTER_LEFT;
 }
 
 .page-header__text {
-    -fx-spacing: 5px;
+    -fx-spacing: 3px;
 }
 
+/* Grosser Titel, wie ihn iOS oben auf einer Seite setzt. */
 .page-title {
-    -fx-font-size: 27px;
-    -fx-font-weight: 600;
-    -fx-text-fill: -gd-text;
+    -fx-font-family: "Inter Display", "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -ios-label;
 }
 
 .page-subtitle {
-    -fx-font-size: 13.5px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ios-label-secondary;
     -fx-wrap-text: true;
 }
 
 .page-body {
-    -fx-padding: 0 34px 34px 34px;
-    -fx-spacing: 18px;
+    -fx-padding: 0 32px 32px 32px;
+    -fx-spacing: 22px;
 }
 
 .scroll-pane,
@@ -274,12 +291,12 @@
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-color: -ios-fill-secondary;
     -fx-background-radius: 999px;
 }
 
 .scroll-bar .thumb:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.28);
+    -fx-background-color: -ios-label-tertiary;
 }
 
 .scroll-bar .track {
@@ -297,20 +314,41 @@
 }
 
 /* ======================================================================
- * Bausteine
+ * Inhalt: eingerueckte, gruppierte Listen
+ *
+ * Das ist Apples "inset grouped" Liste: eine undurchsichtige Karte mit
+ * weichem Radius auf ruhigem Grund, Zeilen durch Haarlinien getrennt, die
+ * nicht bis zum Rand laufen, sondern am Text beginnen.
  * ====================================================================== */
 
 .card {
-    -fx-background-color: -gd-surface;
-    -fx-background-radius: 18px;
-    -fx-border-color: -gd-border;
-    -fx-border-radius: 18px;
-    -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.38), 26, 0, 0, 8);
+    -fx-background-color: -ios-bg-elevated;
+    -fx-background-radius: 16px;
+    -fx-border-color: -ios-separator;
+    -fx-border-radius: 16px;
+    -fx-border-width: 0.6px;
+}
+
+/* Ueber der Gruppe steht ihr Titel – in iOS klein und zurueckhaltend. */
+.group-header {
+    -fx-padding: 0 6px 7px 6px;
+    -fx-spacing: 12px;
+    -fx-alignment: BOTTOM_LEFT;
+}
+
+.group-header__title {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ios-label-secondary;
+}
+
+.group-header__meta {
+    -fx-font-size: 13px;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .card__header {
-    -fx-padding: 20px 22px 14px 22px;
+    -fx-padding: 15px 18px 13px 18px;
     -fx-spacing: 10px;
     -fx-alignment: CENTER_LEFT;
 }
@@ -318,52 +356,50 @@
 .card__title {
     -fx-font-size: 17px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .card__meta {
-    -fx-font-size: 12.5px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 13px;
+    -fx-text-fill: -ios-label-secondary;
 }
 
 .card__body {
-    -fx-padding: 0 22px 20px 22px;
+    -fx-padding: 0 18px 16px 18px;
     -fx-spacing: 12px;
 }
 
 .label-micro {
-    -fx-font-size: 10.5px;
+    -fx-font-size: 11.5px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .label-caption {
-    -fx-font-size: 12.5px;
-    -fx-font-weight: 500;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 13px;
+    -fx-text-fill: -ios-label-secondary;
 }
 
 .label-body {
-    -fx-font-size: 14px;
-    -fx-text-fill: -gd-text;
+    -fx-font-size: 15px;
+    -fx-text-fill: -ios-label;
 }
 
 .label-muted {
-    -fx-font-size: 13px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -ios-label-secondary;
     -fx-wrap-text: true;
 }
 
 .label-faint {
-    -fx-font-size: 13px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
-/* Ein Dateipfad ist Maschinentext: gleichbreite Ziffern, leicht abgesetzt. */
 .label-path {
-    -fx-font-family: "Cascadia Mono", "Consolas", "SF Mono", "Menlo", "DejaVu Sans Mono", monospace;
+    -fx-font-family: "SF Mono", "Cascadia Mono", "Consolas", "Menlo", monospace;
     -fx-font-size: 12.5px;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .settings__control {
@@ -371,15 +407,17 @@
 }
 
 /* ----------------------------------------------------------------------
- * Schaltflächen
+ * Schaltflaechen – Kapseln, wie in iOS
  * -------------------------------------------------------------------- */
 
 .btn {
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-padding: 10px 17px;
-    -fx-font-size: 13.5px;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-min-height: 38px;
+    -fx-padding: 0 18px;
+    -fx-font-size: 15px;
     -fx-font-weight: 600;
+    -fx-graphic-text-gap: 7px;
     -fx-cursor: hand;
 }
 
@@ -388,108 +426,102 @@
     -fx-cursor: default;
 }
 
-.btn-primary {
-    -fx-background-color: -gd-accent;
-    -fx-text-fill: -gd-text-on-accent;
-    -fx-effect: dropshadow(gaussian, rgba(62, 139, 255, 0.35), 16, 0, 0, 4);
+.btn-filled {
+    -fx-background-color: -ios-blue;
+    -fx-text-fill: -ios-label-on-accent;
 }
 
-.btn-primary:hover {
-    -fx-background-color: -gd-accent-bright;
+.btn-filled:hover {
+    -fx-background-color: -ios-blue-pressed;
 }
 
-.btn-primary:pressed {
-    -fx-background-color: -gd-accent-dim;
+.btn-filled:pressed {
+    -fx-background-color: -ios-blue-pressed;
+    -fx-opacity: 0.85;
 }
 
-.btn-primary .icon {
-    -fx-fill: -gd-text-on-accent;
+.btn-filled .icon {
+    -fx-stroke: -ios-label-on-accent;
 }
 
-.btn-primary:focused {
-    -fx-background-color: -gd-accent;
-    -fx-border-color: -gd-text;
-    -fx-border-width: 1.5px;
+.btn-filled:focused {
+    -fx-border-color: -ios-label;
+    -fx-border-width: 2px;
 }
 
-.btn-secondary {
-    -fx-background-color: -gd-surface-strong;
-    -fx-text-fill: -gd-text;
-    -fx-border-color: -gd-border-strong;
-    -fx-border-width: 1px;
+.btn-tinted {
+    -fx-background-color: -ios-blue-wash;
+    -fx-text-fill: -ios-blue;
 }
 
-.btn-secondary:hover {
-    -fx-background-color: -gd-surface-hover;
-    -fx-border-color: -gd-accent;
+.btn-tinted:hover {
+    -fx-background-color: -ios-fill-secondary;
 }
 
-.btn-secondary:pressed {
-    -fx-background-color: -gd-surface-sunken;
+.btn-tinted .icon {
+    -fx-stroke: -ios-blue;
 }
 
-.btn-secondary .icon {
-    -fx-fill: -gd-text-muted;
+.btn-tinted:focused {
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
 }
 
-.btn-secondary:hover .icon {
-    -fx-fill: -gd-accent-bright;
-}
-
-.btn-secondary:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
-}
-
-.btn-ghost {
+.btn-plain {
     -fx-background-color: transparent;
-    -fx-text-fill: -gd-text-muted;
-    -fx-font-weight: 500;
-    -fx-padding: 8px 12px;
+    -fx-text-fill: -ios-blue;
+    -fx-font-weight: normal;
 }
 
-.btn-ghost:hover {
-    -fx-background-color: -gd-surface;
-    -fx-text-fill: -gd-text;
+.btn-plain:hover {
+    -fx-background-color: -ios-fill-quaternary;
 }
 
-.btn-ghost:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+.btn-plain .icon {
+    -fx-stroke: -ios-blue;
 }
 
-.btn-danger {
-    -fx-background-color: -gd-danger-wash;
-    -fx-text-fill: -gd-danger;
-    -fx-border-color: rgba(255, 93, 93, 0.4);
-    -fx-border-width: 1px;
+.btn-plain:focused {
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
 }
 
-.btn-danger:hover {
-    -fx-background-color: rgba(255, 93, 93, 0.24);
-    -fx-border-color: -gd-danger;
+.btn-destructive {
+    -fx-background-color: -ios-red-wash;
+    -fx-text-fill: -ios-red;
 }
 
-.btn-danger:focused {
-    -fx-border-color: -gd-danger;
-    -fx-border-width: 1.5px;
+.btn-destructive:hover {
+    -fx-background-color: -ios-red;
+    -fx-text-fill: -ios-label-on-accent;
 }
 
+.btn-destructive:focused {
+    -fx-border-color: -ios-red;
+    -fx-border-width: 2px;
+}
+
+/* Rundes Symbolfeld, 32 px – im Kopf einer Gruppe. */
 .btn-quiet-icon {
-    -fx-background-color: transparent;
-    -fx-background-radius: 9px;
-    -fx-border-radius: 9px;
-    -fx-padding: 6px;
+    -fx-background-color: -ios-fill-quaternary;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0;
+    -fx-alignment: CENTER;
     -fx-cursor: hand;
 }
 
 .btn-quiet-icon:hover {
-    -fx-background-color: -gd-surface-strong;
+    -fx-background-color: -ios-fill-secondary;
 }
 
 .btn-quiet-icon:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
 }
 
 .btn-quiet-icon:disabled {
@@ -497,15 +529,11 @@
 }
 
 .btn-quiet-icon .icon {
-    -fx-fill: -gd-text-faint;
+    -fx-stroke: -ios-blue;
 }
 
-.btn-quiet-icon:hover .icon {
-    -fx-fill: -gd-text;
-}
-
-.btn-quiet-icon--danger:hover .icon {
-    -fx-fill: -gd-danger;
+.btn-quiet-icon--danger .icon {
+    -fx-stroke: -ios-red;
 }
 
 /* ----------------------------------------------------------------------
@@ -515,31 +543,30 @@
 .text-field,
 .date-picker > .text-field,
 .combo-box-base {
-    -fx-background-color: -gd-surface-sunken;
+    -fx-background-color: -ios-fill-quaternary;
     -fx-background-radius: 10px;
-    -fx-border-color: -gd-border-strong;
+    -fx-border-color: transparent;
     -fx-border-radius: 10px;
-    -fx-border-width: 1px;
-    -fx-padding: 9px 11px;
-    -fx-font-size: 14px;
-    -fx-text-fill: -gd-text;
-    -fx-prompt-text-fill: -gd-text-faint;
-    -fx-highlight-fill: -gd-accent-wash-strong;
-    -fx-highlight-text-fill: -gd-text;
+    -fx-border-width: 1.5px;
+    -fx-min-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 15px;
+    -fx-text-fill: -ios-label;
+    -fx-prompt-text-fill: -ios-label-tertiary;
+    -fx-highlight-fill: -ios-blue-wash;
+    -fx-highlight-text-fill: -ios-label;
 }
 
 .text-field:focused,
 .date-picker:focused > .text-field,
 .combo-box-base:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+    -fx-border-color: -ios-blue;
 }
 
 .text-field--invalid,
 .text-field--invalid:focused,
 .date-picker.text-field--invalid > .text-field {
-    -fx-border-color: -gd-danger;
-    -fx-border-width: 1.5px;
+    -fx-border-color: -ios-red;
 }
 
 .date-picker {
@@ -548,81 +575,88 @@
 
 .date-picker > .arrow-button {
     -fx-background-color: transparent;
-    -fx-padding: 9px 11px;
+    -fx-padding: 0 12px;
 }
 
 .date-picker > .arrow-button > .arrow {
-    -fx-background-color: -gd-text-muted;
+    -fx-background-color: -ios-label-secondary;
 }
 
 .date-picker-popup {
-    -fx-background-color: -gd-bg-raised;
-    -fx-border-color: -gd-border;
-    -fx-border-width: 1px;
+    -fx-background-color: -ios-bg-elevated;
+    -fx-background-radius: 14px;
+    -fx-border-color: -ios-separator;
+    -fx-border-radius: 14px;
+    -fx-border-width: 0.6px;
+    -fx-effect: dropshadow(gaussian, -ios-glass-shadow, 24, 0, 0, 8);
 }
 
 .date-picker-popup > * > .month-year-pane {
-    -fx-background-color: -gd-surface;
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
 }
 
 .date-picker-popup > * > .month-year-pane .label {
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
+    -fx-font-weight: 600;
 }
 
 .date-picker-popup > * > .month-year-pane .button > .left-arrow,
 .date-picker-popup > * > .month-year-pane .button > .right-arrow {
-    -fx-background-color: -gd-text-muted;
+    -fx-background-color: -ios-blue;
 }
 
 .date-picker-popup > * > .calendar-grid {
-    -fx-background-color: -gd-bg-raised;
+    -fx-background-color: transparent;
 }
 
 .date-picker-popup > * > .calendar-grid > .day-name-cell,
 .date-picker-popup > * > .calendar-grid > .week-number-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .date-picker-popup > * > .calendar-grid > .day-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
     -fx-border-color: transparent;
 }
 
 .date-picker-popup > * > .calendar-grid > .day-cell:hover {
-    -fx-background-color: -gd-surface-strong;
+    -fx-background-color: -ios-fill-quaternary;
 }
 
 .date-picker-popup > * > .calendar-grid > .selected {
-    -fx-background-color: -gd-accent;
-    -fx-text-fill: -gd-text-on-accent;
+    -fx-background-color: -ios-blue;
+    -fx-text-fill: -ios-label-on-accent;
+    -fx-background-radius: 999px;
 }
 
 .date-picker-popup > * > .calendar-grid > .today {
-    -fx-border-color: -gd-accent;
+    -fx-border-color: -ios-blue;
     -fx-border-width: 1px;
+    -fx-border-radius: 999px;
 }
 
 .date-picker-popup > * > .calendar-grid > .next-month,
 .date-picker-popup > * > .calendar-grid > .previous-month {
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-quaternary;
 }
 
 .field-label {
-    -fx-font-size: 12.5px;
+    -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text-muted;
+    -fx-text-fill: -ios-label-secondary;
 }
 
 .field-hint {
-    -fx-font-size: 11.5px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 12px;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .field-error {
-    -fx-font-size: 12.5px;
-    -fx-text-fill: -gd-danger;
+    -fx-font-size: 13px;
+    -fx-text-fill: -ios-red;
     -fx-wrap-text: true;
 }
 
@@ -637,11 +671,8 @@
 }
 
 .grade-track__rail {
-    -fx-background-color: -gd-surface-sunken;
+    -fx-background-color: -ios-fill-tertiary;
     -fx-background-radius: 999px;
-    -fx-border-color: -gd-border;
-    -fx-border-radius: 999px;
-    -fx-border-width: 1px;
 }
 
 .grade-track__fill {
@@ -649,105 +680,115 @@
 }
 
 .grade-track__tick {
-    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-background-color: -ios-separator;
 }
 
 .grade-track__threshold {
-    -fx-background-color: -gd-chart-threshold;
+    -fx-background-color: -ios-chart-threshold;
     -fx-background-radius: 1px;
-    -fx-opacity: 0.8;
+    -fx-opacity: 0.75;
 }
 
 .grade-track__marker {
     -fx-background-radius: 999px;
-    -fx-border-color: -gd-bg;
+    -fx-border-color: -ios-bg-elevated;
     -fx-border-radius: 999px;
     -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 4, 0, 0, 1);
 }
 
-/* Notenfarben als Füllung */
-.grade-fill--insufficient { -fx-background-color: -gd-grade-insufficient; }
-.grade-fill--40 { -fx-background-color: -gd-grade-40; }
-.grade-fill--45 { -fx-background-color: -gd-grade-45; }
-.grade-fill--50 { -fx-background-color: -gd-grade-50; }
-.grade-fill--55 { -fx-background-color: -gd-grade-55; }
-.grade-fill--60 { -fx-background-color: -gd-grade-60; }
+.grade-fill--insufficient { -fx-background-color: -ios-grade-insufficient; }
+.grade-fill--40 { -fx-background-color: -ios-grade-40; }
+.grade-fill--45 { -fx-background-color: -ios-grade-45; }
+.grade-fill--50 { -fx-background-color: -ios-grade-50; }
+.grade-fill--55 { -fx-background-color: -ios-grade-55; }
+.grade-fill--60 { -fx-background-color: -ios-grade-60; }
 
 /* ----------------------------------------------------------------------
- * Noten-Darstellung in Listen
+ * Notenwerte und Abzeichen
  * -------------------------------------------------------------------- */
 
 .grade-value {
-    -fx-font-size: 20px;
+    -fx-font-family: "Inter Display", "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+    -fx-font-size: 21px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .grade-value--none {
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-quaternary;
 }
 
 .grade-exact {
     -fx-font-size: 12px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .badge {
     -fx-background-radius: 999px;
-    -fx-padding: 4px 11px;
-    -fx-font-size: 11.5px;
+    -fx-padding: 4px 10px;
+    -fx-font-size: 12px;
     -fx-font-weight: 600;
 }
 
 .badge--ok {
-    -fx-background-color: rgba(79, 202, 132, 0.16);
-    -fx-text-fill: #7fe0a8;
+    -fx-background-color: -ios-badge-ok-bg;
+    -fx-text-fill: -ios-badge-ok-text;
 }
 
 .badge--fail {
-    -fx-background-color: -gd-danger-wash;
-    -fx-text-fill: #ff8b8b;
+    -fx-background-color: -ios-badge-fail-bg;
+    -fx-text-fill: -ios-badge-fail-text;
 }
 
 .badge--none {
-    -fx-background-color: -gd-surface-sunken;
-    -fx-text-fill: -gd-text-faint;
-    -fx-border-color: -gd-border;
-    -fx-border-radius: 999px;
-    -fx-border-width: 1px;
+    -fx-background-color: -ios-fill-quaternary;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 /* ----------------------------------------------------------------------
- * Modulzeile in der Übersicht
+ * Listenzeile
+ *
+ * Die Trennlinie beginnt dort, wo der Text beginnt – nicht am Kartenrand.
+ * Das ist in iOS der Unterschied zwischen «sieht richtig aus» und «fast».
  * -------------------------------------------------------------------- */
 
 .module-row {
-    -fx-padding: 14px 22px;
-    -fx-spacing: 18px;
+    -fx-padding: 11px 18px;
+    -fx-spacing: 16px;
+    -fx-min-height: 44px;
     -fx-alignment: CENTER_LEFT;
     -fx-background-color: transparent;
-    -fx-border-color: -gd-border transparent transparent transparent;
-    -fx-border-width: 1px 0 0 0;
 }
 
 .module-row:hover {
-    -fx-background-color: -gd-surface;
+    -fx-background-color: -ios-bg-elevated-hover;
+}
+
+.row-separator-inset {
+    -fx-padding: 0 0 0 18px;
+}
+
+.row-separator {
+    -fx-background-color: -ios-separator;
+    -fx-min-height: 0.6px;
+    -fx-pref-height: 0.6px;
+    -fx-max-height: 0.6px;
 }
 
 .module-row__name {
-    -fx-font-size: 14.5px;
-    -fx-font-weight: 500;
-    -fx-text-fill: -gd-text;
+    -fx-font-size: 15px;
+    -fx-text-fill: -ios-label;
 }
 
 .module-row__count {
-    -fx-font-size: 12px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -ios-label-tertiary;
 }
 
 .module-summary {
-    -fx-padding: 0 22px 16px 22px;
-    -fx-spacing: 18px;
+    -fx-padding: 0 18px 14px 18px;
+    -fx-spacing: 16px;
     -fx-alignment: CENTER_LEFT;
 }
 
@@ -764,43 +805,45 @@
 .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-background-color: transparent;
     -fx-padding: 0;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .picker-cell {
-    -fx-padding: 11px 13px;
-    -fx-spacing: 3px;
-    -fx-background-radius: 11px;
-    -fx-border-radius: 11px;
+    -fx-padding: 9px 12px;
+    -fx-spacing: 2px;
+    -fx-background-radius: 10px;
+    -fx-min-height: 44px;
     -fx-background-color: transparent;
     -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
 }
 
 .picker-cell:hover {
-    -fx-background-color: -gd-surface;
+    -fx-background-color: -ios-fill-quaternary;
 }
 
 .picker-cell--selected,
 .picker-cell--selected:hover {
-    -fx-background-color: -gd-accent-wash;
-    -fx-border-color: rgba(139, 92, 246, 0.45);
-    -fx-border-width: 1px;
+    -fx-background-color: -ios-blue;
 }
 
 .picker-cell__title {
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-text-fill: -gd-text;
+    -fx-font-size: 15px;
+    -fx-text-fill: -ios-label;
 }
 
 .picker-cell--selected .picker-cell__title {
-    -fx-text-fill: -gd-accent-bright;
+    -fx-text-fill: -ios-label-on-accent;
     -fx-font-weight: 600;
 }
 
 .picker-cell__meta {
-    -fx-font-size: 11.5px;
-    -fx-text-fill: -gd-text-faint;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -ios-label-tertiary;
+}
+
+.picker-cell--selected .picker-cell__meta {
+    -fx-text-fill: rgba(255, 255, 255, 0.82);
 }
 
 .table-view {
@@ -816,40 +859,39 @@
 
 .table-view .column-header-background {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent -gd-border transparent;
-    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: transparent transparent -ios-separator transparent;
+    -fx-border-width: 0 0 0.6px 0;
 }
 
 .table-view .column-header,
 .table-view .filler {
     -fx-background-color: transparent;
-    -fx-size: 36px;
+    -fx-size: 34px;
     -fx-padding: 0 8px;
 }
 
 .table-view .column-header .label {
-    -fx-font-size: 10.5px;
+    -fx-font-size: 11.5px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text-faint;
+    -fx-text-fill: -ios-label-tertiary;
     -fx-alignment: CENTER_LEFT;
 }
 
 .table-view .table-row-cell {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent -gd-border transparent;
-    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: transparent transparent -ios-separator transparent;
+    -fx-border-width: 0 0 0.6px 0;
     -fx-cell-size: 46px;
 }
 
 .table-view .table-row-cell:hover {
-    -fx-background-color: -gd-surface;
+    -fx-background-color: -ios-bg-elevated-hover;
 }
 
 .table-view .table-row-cell:selected {
-    -fx-background-color: -gd-accent-wash;
+    -fx-background-color: -ios-blue-wash;
 }
 
-/* Leere Zeilen unterhalb der Daten bekommen keine Trennlinie. */
 .table-view .table-row-cell:empty,
 .table-view .table-row-cell:empty:hover {
     -fx-background-color: transparent;
@@ -858,13 +900,13 @@
 
 .table-view .table-cell {
     -fx-padding: 0 8px;
-    -fx-font-size: 13.5px;
-    -fx-text-fill: -gd-text;
+    -fx-font-size: 14.5px;
+    -fx-text-fill: -ios-label;
     -fx-alignment: CENTER_LEFT;
 }
 
 .table-view .table-row-cell:selected .table-cell {
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .table-view .table-cell.table-cell--numeric {
@@ -876,93 +918,85 @@
 }
 
 .table-view:focused {
-    -fx-border-color: -gd-accent;
-    -fx-border-width: 1.5px;
+    -fx-border-color: -ios-blue;
+    -fx-border-width: 2px;
     -fx-border-radius: 10px;
 }
 
 .table-view .placeholder .label {
-    -fx-text-fill: -gd-text-faint;
-    -fx-font-size: 13px;
+    -fx-text-fill: -ios-label-tertiary;
+    -fx-font-size: 14px;
 }
 
 /* ----------------------------------------------------------------------
- * Leere Zustände und Hinweise
+ * Leere Zustaende und Hinweise
  * -------------------------------------------------------------------- */
 
 .empty-state {
     -fx-padding: 54px 32px;
-    -fx-spacing: 12px;
+    -fx-spacing: 10px;
     -fx-alignment: CENTER;
 }
 
 .empty-state--compact {
-    -fx-padding: 30px 22px;
+    -fx-padding: 28px 20px;
 }
 
 .empty-state__title {
-    -fx-font-size: 18px;
+    -fx-font-size: 19px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
 }
 
 .empty-state__text {
-    -fx-font-size: 13.5px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 14.5px;
+    -fx-text-fill: -ios-label-secondary;
     -fx-wrap-text: true;
     -fx-text-alignment: CENTER;
     -fx-max-width: 460px;
 }
 
 .empty-state__action {
-    -fx-padding: 10px 0 0 0;
+    -fx-padding: 12px 0 0 0;
 }
 
-/*
- * Das Symbol im leeren Zustand sitzt auf einer abgerundeten Akzentkachel –
- * dieselbe Figur, die im Vorbild die Kurse markiert.
- */
+/* Rundes Symbolfeld in der Akzentfarbe – Apples Muster fuer leere Zustaende. */
 .empty-state__mark {
-    -fx-background-color: -gd-accent-wash;
-    -fx-background-radius: 16px;
-    -fx-border-color: rgba(62, 139, 255, 0.3);
-    -fx-border-radius: 16px;
-    -fx-border-width: 1px;
-    -fx-padding: 14px;
+    -fx-background-color: -ios-blue-wash;
+    -fx-background-radius: 999px;
+    -fx-padding: 18px;
     -fx-max-width: -Infinity;
     -fx-max-height: -Infinity;
 }
 
 .empty-state__mark .icon {
-    -fx-fill: -gd-accent-bright;
+    -fx-stroke: -ios-blue;
 }
 
 .banner {
-    -fx-background-radius: 12px;
-    -fx-padding: 13px 17px;
-    -fx-spacing: 12px;
+    -fx-background-radius: 14px;
+    -fx-padding: 13px 16px;
+    -fx-spacing: 11px;
     -fx-alignment: CENTER_LEFT;
 }
 
 .banner--warning {
-    -fx-background-color: -gd-warning-wash;
-    -fx-border-color: rgba(251, 191, 75, 0.35);
-    -fx-border-radius: 12px;
-    -fx-border-width: 1px;
+    -fx-background-color: -ios-orange-wash;
+    -fx-background-radius: 14px;
 }
 
 .banner__text {
-    -fx-font-size: 13px;
-    -fx-text-fill: #f8d9a0;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -ios-label;
     -fx-wrap-text: true;
 }
 
 .banner--warning .icon {
-    -fx-fill: -gd-warning;
+    -fx-stroke: -ios-orange;
 }
 
 .icon--alert {
-    -fx-fill: -gd-warning;
+    -fx-stroke: -ios-orange;
 }
 
 /* ======================================================================
@@ -970,7 +1004,7 @@
  * ====================================================================== */
 
 .grade-chart-container {
-    -fx-padding: 20px 22px 6px 22px;
+    -fx-padding: 18px 18px 4px 18px;
 }
 
 .grade-chart {
@@ -978,7 +1012,7 @@
 }
 
 .grade-chart .chart-plot-background {
-    -fx-background-color: -gd-chart-plot;
+    -fx-background-color: transparent;
 }
 
 .grade-chart .chart-vertical-grid-lines {
@@ -986,8 +1020,8 @@
 }
 
 .grade-chart .chart-horizontal-grid-lines {
-    -fx-stroke: -gd-chart-grid;
-    -fx-stroke-width: 1px;
+    -fx-stroke: -ios-chart-grid;
+    -fx-stroke-width: 0.8px;
 }
 
 .grade-chart .chart-alternative-row-fill {
@@ -996,115 +1030,110 @@
 }
 
 .grade-chart .axis {
-    -fx-tick-label-fill: -gd-text-muted;
-    -fx-tick-label-font-size: 11.5px;
+    -fx-tick-label-fill: -ios-label-secondary;
+    -fx-tick-label-font-size: 12px;
     -fx-tick-mark-visible: false;
     -fx-minor-tick-visible: false;
 }
 
-.grade-chart .axis:left {
-    -fx-tick-label-font-size: 12px;
-}
-
 .grade-chart .axis .axis-label {
-    -fx-text-fill: -gd-text-faint;
-    -fx-font-size: 10.5px;
+    -fx-text-fill: -ios-label-tertiary;
+    -fx-font-size: 11.5px;
     -fx-font-weight: 600;
 }
 
 .grade-chart .chart-bar {
-    -fx-bar-fill: -gd-grade-50;
-    -fx-background-radius: 8px 8px 2px 2px;
+    -fx-bar-fill: -ios-grade-50;
+    -fx-background-radius: 9px 9px 3px 3px;
     -fx-background-insets: 0;
 }
 
-.grade-chart .chart-bar.bar--insufficient { -fx-bar-fill: -gd-grade-insufficient; }
-.grade-chart .chart-bar.bar--40 { -fx-bar-fill: -gd-grade-40; }
-.grade-chart .chart-bar.bar--45 { -fx-bar-fill: -gd-grade-45; }
-.grade-chart .chart-bar.bar--50 { -fx-bar-fill: -gd-grade-50; }
-.grade-chart .chart-bar.bar--55 { -fx-bar-fill: -gd-grade-55; }
-.grade-chart .chart-bar.bar--60 { -fx-bar-fill: -gd-grade-60; }
+.grade-chart .chart-bar.bar--insufficient { -fx-bar-fill: -ios-grade-insufficient; }
+.grade-chart .chart-bar.bar--40 { -fx-bar-fill: -ios-grade-40; }
+.grade-chart .chart-bar.bar--45 { -fx-bar-fill: -ios-grade-45; }
+.grade-chart .chart-bar.bar--50 { -fx-bar-fill: -ios-grade-50; }
+.grade-chart .chart-bar.bar--55 { -fx-bar-fill: -ios-grade-55; }
+.grade-chart .chart-bar.bar--60 { -fx-bar-fill: -ios-grade-60; }
 
 .chart-threshold-line {
-    -fx-stroke: -gd-chart-threshold;
-    -fx-stroke-width: 1.5px;
+    -fx-stroke: -ios-chart-threshold;
+    -fx-stroke-width: 1.2px;
 }
 
 .chart-semester-divider {
-    -fx-stroke: -gd-border-strong;
+    -fx-stroke: -ios-separator;
     -fx-stroke-width: 1px;
-    -fx-stroke-dash-array: 3 4;
+    -fx-stroke-dash-array: 2 4;
 }
 
 .chart-semester-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 11.5px;
     -fx-font-weight: 600;
-    -fx-fill: -gd-text-muted;
+    -fx-fill: -ios-label-secondary;
 }
 
 .chart-threshold-caption {
-    -fx-font-size: 10.5px;
+    -fx-font-size: 11px;
     -fx-font-weight: 600;
-    -fx-fill: -gd-chart-threshold;
+    -fx-fill: -ios-chart-threshold;
 }
 
-/*
- * Achtung: ".chart-legend" ist von JavaFX selbst belegt – modena gibt dieser
- * Klasse einen hellen Hintergrund. Deshalb hier ein eigener Name.
- */
 .chart-legend-bar {
-    -fx-padding: 4px 22px 20px 22px;
+    -fx-padding: 2px 18px 18px 18px;
     -fx-background-color: transparent;
 }
 
 .chart-legend-swatch {
-    -fx-min-width: 14px;
-    -fx-min-height: 14px;
-    -fx-max-width: 14px;
-    -fx-max-height: 14px;
-    -fx-background-radius: 5px;
+    -fx-min-width: 13px;
+    -fx-min-height: 13px;
+    -fx-max-width: 13px;
+    -fx-max-height: 13px;
+    -fx-background-radius: 999px;
 }
 
 .chart-legend-label {
-    -fx-font-size: 12px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -ios-label-secondary;
 }
 
 /* ======================================================================
- * Dialoge
+ * Dialoge – Apples Blatt: abgerundet, mittig, ruhig
  * ====================================================================== */
 
 .dialog-pane {
-    -fx-background-color: -gd-bg-raised;
-    -fx-padding: 4px;
-    -fx-border-color: -gd-border;
-    -fx-border-width: 1px;
+    -fx-background-color: -ios-bg-elevated;
+    -fx-background-radius: 18px;
+    -fx-border-color: -ios-separator;
+    -fx-border-radius: 18px;
+    -fx-border-width: 0.6px;
+    -fx-padding: 2px;
 }
 
 .dialog-pane > .header-panel {
-    -fx-background-color: -gd-bg-raised;
-    -fx-padding: 22px 26px 4px 26px;
+    -fx-background-color: transparent;
+    -fx-padding: 22px 24px 2px 24px;
 }
 
 .dialog-pane > .header-panel > .label {
-    -fx-font-size: 18px;
+    -fx-font-family: "Inter Display", "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+    -fx-font-size: 19px;
     -fx-font-weight: 600;
-    -fx-text-fill: -gd-text;
+    -fx-text-fill: -ios-label;
     -fx-wrap-text: true;
 }
 
 .dialog-pane > .content,
 .dialog-pane > .content.label {
-    -fx-background-color: -gd-bg-raised;
-    -fx-padding: 10px 26px 18px 26px;
-    -fx-font-size: 14px;
-    -fx-text-fill: -gd-text-muted;
+    -fx-background-color: transparent;
+    -fx-padding: 10px 24px 18px 24px;
+    -fx-font-size: 14.5px;
+    -fx-text-fill: -ios-label-secondary;
     -fx-wrap-text: true;
 }
 
 .dialog-pane > .button-bar {
-    -fx-background-color: -gd-bg-raised;
-    -fx-padding: 8px 22px 20px 22px;
+    -fx-background-color: transparent;
+    -fx-padding: 6px 20px 20px 20px;
 }
 
 .dialog-pane > .button-bar > .container {
@@ -1121,7 +1150,7 @@
 }
 
 .dialog-form__row {
-    -fx-spacing: 16px;
+    -fx-spacing: 14px;
 }
 
 /* ======================================================================
@@ -1129,17 +1158,17 @@
  * ====================================================================== */
 
 .tooltip {
-    -fx-background-color: -gd-bg-raised;
-    -fx-background-radius: 8px;
-    -fx-border-color: -gd-border-strong;
-    -fx-border-radius: 8px;
-    -fx-border-width: 1px;
-    -fx-text-fill: -gd-text;
-    -fx-font-size: 12.5px;
-    -fx-padding: 8px 11px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 14, 0, 0, 4);
+    -fx-background-color: -ios-bg-elevated;
+    -fx-background-radius: 10px;
+    -fx-border-color: -ios-separator;
+    -fx-border-radius: 10px;
+    -fx-border-width: 0.6px;
+    -fx-text-fill: -ios-label;
+    -fx-font-size: 13px;
+    -fx-padding: 9px 12px;
+    -fx-effect: dropshadow(gaussian, -ios-glass-shadow, 16, 0, 0, 5);
 }
 
 .icon {
-    -fx-fill: -gd-text-muted;
+    -fx-stroke: -ios-label-secondary;
 }

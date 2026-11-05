@@ -2,6 +2,7 @@ package ch.gradedesk;
 
 import ch.gradedesk.i18n.I18n;
 import ch.gradedesk.i18n.Language;
+import ch.gradedesk.ui.util.Appearance;
 import ch.gradedesk.model.GradeBook;
 import ch.gradedesk.persistence.GradeRepository;
 import ch.gradedesk.persistence.JsonGradeRepository;
@@ -13,6 +14,7 @@ import ch.gradedesk.ui.AppServices;
 import ch.gradedesk.ui.MainController;
 import ch.gradedesk.ui.control.Dialogs;
 import ch.gradedesk.ui.util.Theme;
+import java.util.Optional;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -45,7 +47,7 @@ public final class GradeDeskApp extends Application {
     public void start(Stage stage) throws IOException {
         // Sprache zuerst: alles Folgende liest bereits übersetzte Texte.
         SettingsStore settings = new SettingsStore();
-        restoreLanguage(settings);
+        restorePreferences(settings);
 
         GradeRepository repository = new JsonGradeRepository();
         GradeBookService service = new GradeBookService(new GradeBook(), repository);
@@ -81,14 +83,24 @@ public final class GradeDeskApp extends Application {
      * Stellt die zuletzt gewählte Sprache wieder her und merkt sich jede weitere
      * Wahl. Ohne gespeicherte Einstellung entscheidet die Systemsprache.
      */
-    private void restoreLanguage(SettingsStore settings) {
-        settings.load()
-                .map(SettingsStore.AppSettings::language)
+    private void restorePreferences(SettingsStore settings) {
+        Optional<SettingsStore.AppSettings> stored = settings.load();
+
+        stored.map(SettingsStore.AppSettings::language)
                 .flatMap(Language::fromTag)
                 .ifPresent(I18n::setLanguage);
 
+        stored.map(SettingsStore.AppSettings::appearance)
+                .flatMap(Appearance::fromTag)
+                .ifPresent(Theme::setAppearance);
+
         I18n.languageProperty().addListener((observable, previous, current) ->
-                settings.save(SettingsStore.AppSettings.of(current.tag())));
+                settings.save(SettingsStore.AppSettings.of(
+                        current.tag(), Theme.getAppearance().tag())));
+
+        Theme.appearanceProperty().addListener((observable, previous, current) ->
+                settings.save(SettingsStore.AppSettings.of(
+                        I18n.getLanguage().tag(), current.tag())));
     }
 
     /** Formuliert das Ladeergebnis in der eingestellten Sprache. */

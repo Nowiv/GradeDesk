@@ -40,6 +40,16 @@
                 <VBox styleClass="card">
                     <HBox styleClass="card__header">
                         <VBox HBox.hgrow="ALWAYS">
+                            <Label styleClass="card__title" text="%settings.appearance.title"/>
+                            <Label styleClass="card__meta" text="%settings.appearance.subtitle"/>
+                        </VBox>
+                        <VBox fx:id="appearanceSwitchBox" styleClass="settings__control"/>
+                    </HBox>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <HBox styleClass="card__header">
+                        <VBox HBox.hgrow="ALWAY">
                             <Label styleClass="card__title" text="%settings.storage.title"/>
                             <Label styleClass="card__meta" text="%settings.storage.subtitle"/>
                         </VBox>

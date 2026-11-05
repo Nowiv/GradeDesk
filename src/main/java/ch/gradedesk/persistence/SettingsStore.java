@@ -78,13 +78,13 @@ public final class SettingsStore {
      * @param schemaVersion Format dieser Datei, für spätere Erweiterungen
      * @param language      Sprachkennung, z.B. {@code de} oder {@code en}
      */
-    public record AppSettings(int schemaVersion, String language) {
+    public record AppSettings(int schemaVers, String language, String appearance) {
 
         /** Aktuelle Version des Einstellungsformats. */
         public static final int CURRENT_SCHEMA_VERSION = 1;
 
-        public static AppSettings of(String language) {
-            return new AppSettings(CURRENT_SCHEMA_VERSION, language);
+        public static AppSettings of(String language, String appearance) {
+            return new AppSettings(CURRENT_SCHEMA_VERSION, language, appearance);
         }
     }
 }
