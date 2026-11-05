@@ -1,0 +1,95 @@
+name: Release
+
+# Baut auf jedem Versions-Tag (z.B. v1.0.0) native Installer für Windows, macOS
+# und Linux und hängt sie an den GitHub-Release.
+#
+# Jeder Installer bringt über jlink seine eigene Java-Runtime mit. Wer die
+# Anwendung installiert, braucht kein Java auf dem Rechner.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Installer für ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: Windows
+            artifact: notenrechner-windows
+            pattern: target/installer/*.msi
+          - os: macos-latest
+            label: macOS
+            artifact: notenrechner-macos
+            pattern: target/installer/*.dmg
+          - os: ubuntu-latest
+            label: Linux
+            artifact: notenrechner-linux
+            pattern: target/installer/*.deb
+
+    steps:
+      - name: Quellcode auschecken
+        uses: actions/checkout@v4
+
+      - name: JDK 21 einrichten
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Werkzeuge für das Debian-Paket
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install --yes fakeroot binutils
+
+      - name: Tests ausführen
+        run: ./mvnw --batch-mode verify
+        shell: bash
+
+      - name: Installer bauen
+        run: ./mvnw --batch-mode -Pinstaller -DskipTests package
+        shell: bash
+
+      - name: Installer hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.pattern }}
+          if-no-files-found: error
+
+  release:
+    name: Release veröffentlichen
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Installer einsammeln
+        uses: actions/download-artifact@v4
+        with:
+          path: installer
+          merge-multiple: true
+
+      - name: Release erstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/*
+          draft: false
+          generate_release_notes: true
+          body: |
+            Native Installer für Windows, macOS und Linux. Eine eigene
+            Java-Runtime ist jeweils enthalten, eine Java-Installation ist
+            nicht nötig.
+
+            Die Installer sind nicht signiert. Windows zeigt deshalb eine
+            SmartScreen-Warnung, macOS eine Gatekeeper-Warnung. Wie man sie
+            bestätigt, steht in der README.

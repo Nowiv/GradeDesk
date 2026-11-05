@@ -1,0 +1,66 @@
+/*
+ * Theme: alle Farben des Notenrechners an einer Stelle.
+ *
+ * JavaFX kennt "looked-up colors": ein Name, der mit -nr- beginnt, wird hier
+ * einmal definiert und in app.css überall sonst nur noch referenziert. Wer die
+ * Anwendung umfärben will, ändert ausschliesslich diese Datei.
+ */
+
+.root {
+
+    /* --- Marke: Rot und Weiss ------------------------------------------- */
+    -nr-red: #d52b1e;
+    -nr-red-strong: #b32319;
+    -nr-red-deep: #8f1710;
+    -nr-red-deeper: #7a120c;
+    -nr-red-tint: #fdeceb;
+
+    /* --- Flächen und Linien --------------------------------------------- */
+    -nr-bg: #f4f2f1;
+    -nr-surface: #ffffff;
+    -nr-surface-sunken: #faf9f8;
+    -nr-surface-hover: #f6f3f2;
+    -nr-border: #e3dedb;
+    -nr-border-strong: #cfc8c4;
+
+    /* --- Text ------------------------------------------------------------ */
+    -nr-text: #1c1917;
+    -nr-text-muted: #6c6360;
+    -nr-text-faint: #9a918d;
+    -nr-text-on-red: #ffffff;
+    -nr-text-on-red-muted: #f3cfcc;
+
+    /* --- Notenfarben -----------------------------------------------------
+     * Diese Farben bedeuten ausschliesslich Notenwerte und sind unabhängig
+     * von der Markenfarbe zu lesen.
+     */
+    -nr-grade-insufficient: #c62828;
+    -nr-grade-40: #9ccc95;
+    -nr-grade-45: #6fb869;
+    -nr-grade-50: #45a049;
+    -nr-grade-55: #2e7d32;
+    -nr-grade-60: #1b5e20;
+
+    /* Text, der auf der jeweiligen Notenfarbe steht. */
+    -nr-on-grade-light: #14301a;
+    -nr-on-grade-dark: #ffffff;
+
+    /* --- Rückmeldungen ---------------------------------------------------- */
+    -nr-warning: #b45309;
+    -nr-warning-tint: #fef3e2;
+    -nr-success: #2e7d32;
+
+    /* --- Diagramm --------------------------------------------------------- */
+    -nr-chart-grid: #e7e2df;
+    -nr-chart-threshold: #1c1917;
+
+    /* --- Schrift ---------------------------------------------------------- */
+    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Inter", "Noto Sans", sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -nr-text;
+
+    /* Fokusring der Plattform abschalten; app.css zeichnet einen eigenen. */
+    -fx-focus-color: -nr-red;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: -nr-bg;
+}

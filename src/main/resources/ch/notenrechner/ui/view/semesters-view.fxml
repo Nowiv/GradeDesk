@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Arbeitsansicht: Semester auswählen, darin ein Modul, darin die Noten bearbeiten.
+  Drei Spalten, von links nach rechts immer konkreter.
+-->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+
+    <top>
+        <HBox styleClass="page-header">
+            <VBox styleClass="page-header__text" HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="Semester &amp; Module"/>
+                <Label styleClass="page-subtitle"
+                       text="Semester, Module und Noten anlegen, ändern und löschen. Jede Änderung wird sofort gespeichert."/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox styleClass="page-body">
+
+            <!-- Spalte 1: Semester -->
+            <VBox maxWidth="252.0" minWidth="176.0" prefWidth="236.0" styleClass="card">
+                <HBox styleClass="card__header">
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label styleClass="card__title" text="Semester"/>
+                        <Label fx:id="semesterMetaLabel" styleClass="card__meta"/>
+                    </VBox>
+                    <Button fx:id="renameSemesterButton" styleClass="btn-quiet-icon"/>
+                    <Button fx:id="deleteSemesterButton" styleClass="btn-quiet-icon,btn-quiet-icon--danger"/>
+                </HBox>
+                <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="semesterList" VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="addSemesterButton" maxWidth="1.7976931348623157E308"
+                            styleClass="btn,btn-secondary" text="Neues Semester"/>
+                </VBox>
+            </VBox>
+
+            <!-- Spalte 2: Module des gewählten Semesters -->
+            <VBox maxWidth="252.0" minWidth="176.0" prefWidth="236.0" styleClass="card">
+                <HBox styleClass="card__header">
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label styleClass="card__title" text="Module"/>
+                        <Label fx:id="moduleMetaLabel" styleClass="card__meta"/>
+                    </VBox>
+                    <Button fx:id="renameModuleButton" styleClass="btn-quiet-icon"/>
+                    <Button fx:id="deleteModuleButton" styleClass="btn-quiet-icon,btn-quiet-icon--danger"/>
+                </HBox>
+                <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="moduleList" VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="addModuleButton" maxWidth="1.7976931348623157E308"
+                            styleClass="btn,btn-secondary" text="Neues Modul"/>
+                </VBox>
+            </VBox>
+
+            <!-- Spalte 3: Noten des gewählten Moduls -->
+            <VBox minWidth="330.0" styleClass="card" HBox.hgrow="ALWAYS">
+                <HBox styleClass="card__header">
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="gradesTitleLabel" styleClass="card__title" text="Noten"/>
+                        <Label fx:id="gradesMetaLabel" styleClass="card__meta"/>
+                    </VBox>
+    </HBox>
+                <HBox fx:id="moduleGradeBox" styleClass="module-summary"/>
+                <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="gradesTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="labelColumn" minWidth="84.0" prefWidth="124.0"
+                                         text="BEZEICHNUNG"/>
+                            <TableColumn fx:id="dateColumn" maxWidth="116.0" minWidth="92.0" prefWidth="100.0"
+                                         text="DATUM"/>
+                            <TableColumn fx:id="valueColumn" maxWidth="64.0" minWidth="46.0" prefWidth="52.0"
+                                         text="NOTE"/>
+                            <TableColumn fx:id="weightColumn" maxWidth="78.0" minWidth="56.0" prefWidth="62.0"
+                                         text="GEWICHT"/>
+                            <TableColumn fx:id="actionColumn" maxWidth="68.0" minWidth="68.0"
+                                         prefWidth="68.0" sortable="false" text=""/>
+                        </columns>
+                    </TableView>
+                    <Button fx:id="addGradeButton" maxWidth="1.7976931348623157E308"
+                            styleClass="btn,btn-primary" text="Note erfassen"/>
+                </VBox>
+            </VBox>
+
+        </HBox>
+    </center>
+
+</BorderPane>
