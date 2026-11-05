@@ -13,4 +13,8 @@ module ch.notenrechner {
 
     exports ch.notenrechner.model;
     exports ch.notenrechner.service;
+    exports ch.notenrechner.persistence;
+
+    // Jackson liest und schreibt die Records im DTO-Paket per Reflection.
+    opens ch.notenrechner.persistence.dto to com.fasterxml.jackson.databind;
 }
