@@ -1,8 +1,12 @@
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
+import java.awt.Shape;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -29,13 +33,16 @@ import java.util.List;
  */
 public final class IconGenerator {
 
-    private static final Color RED = new Color(0xD5, 0x2B, 0x1E);
-    private static final Color RED_DEEP = new Color(0x8F, 0x17, 0x10);
+    private static final Color BG_TOP = new Color(0x16, 0x1F, 0x3D);
+    private static final Color BG_BOTTOM = new Color(0x07, 0x0B, 0x18);
+    private static final Color ACCENT = new Color(0x3E, 0x8B, 0xFF);
+    private static final Color ACCENT_BRIGHT = new Color(0x6F, 0xB2, 0xFF);
+    private static final Color VIOLET = new Color(0x8B, 0x5C, 0xF6);
     private static final Color WHITE = Color.WHITE;
 
     public static void main(String[] args) throws IOException {
         Path root = Path.of(".");
-        Path resources = root.resolve("src/main/resources/ch/notenrechner/icon");
+        Path resources = root.resolve("src/main/resources/ch/gradedesk/icon");
         Path packaging = root.resolve("packaging");
 
         Files.createDirectories(resources);
@@ -44,11 +51,11 @@ public final class IconGenerator {
         Files.createDirectories(packaging.resolve("linux"));
 
         BufferedImage icon256 = render(256);
-        ImageIO.write(icon256, "png", resources.resolve("notenrechner-256.png").toFile());
-        ImageIO.write(icon256, "png", packaging.resolve("linux/Notenrechner.png").toFile());
+        ImageIO.write(icon256, "png", resources.resolve("gradedesk-256.png").toFile());
+        ImageIO.write(icon256, "png", packaging.resolve("linux/GradeDesk.png").toFile());
 
-        writeIco(packaging.resolve("windows/Notenrechner.ico"), List.of(16, 24, 32, 48, 64, 128, 256));
-        writeIcns(packaging.resolve("macos/Notenrechner.icns"));
+        writeIco(packaging.resolve("windows/GradeDesk.ico"), List.of(16, 24, 32, 48, 64, 128, 256));
+        writeIcns(packaging.resolve("macos/GradeDesk.icns"));
 
         System.out.println("Programmsymbole erzeugt.");
     }
@@ -63,35 +70,50 @@ public final class IconGenerator {
         double s = size;
         double radius = s * 0.22;
 
-        g.setColor(RED);
-        g.fill(new RoundRectangle2D.Double(0, 0, s, s, radius, radius));
+        RoundRectangle2D tile = new RoundRectangle2D.Double(0, 0, s, s, radius, radius);
 
-        // Dezenter Rand, damit das Symbol auf hellem Grund nicht ausfranst.
-        g.setColor(new Color(RED_DEEP.getRed(), RED_DEEP.getGreen(), RED_DEEP.getBlue(), 120));
+        // Dunkler Grund mit Verlauf, wie die Arbeitsfläche der Anwendung.
+        g.setPaint(new GradientPaint(0, 0, BG_TOP, (float) s, (float) s, BG_BOTTOM));
+        g.fill(tile);
+
+        // Ein blauer Lichtschein unten rechts, derselbe Gedanke wie im Fenster.
+        Shape clip = g.getClip();
+        g.setClip(tile);
+        g.setPaint(new RadialGradientPaint(
+                new Point2D.Double(s * 0.82, s * 0.86), (float) (s * 0.72),
+                new float[] {0f, 1f},
+                new Color[] {new Color(0x3E, 0x8B, 0xFF, 95), new Color(0x3E, 0x8B, 0xFF, 0)}));
+        g.fill(tile);
+        g.setClip(clip);
+
+        // Dezenter heller Rand, damit die Kachel auf dunklem Grund nicht verschwimmt.
+        g.setPaint(new Color(255, 255, 255, 46));
         g.setStroke(new BasicStroke((float) Math.max(1, s * 0.008)));
         double inset = s * 0.012;
         g.draw(new RoundRectangle2D.Double(inset, inset, s - 2 * inset, s - 2 * inset,
                 radius, radius));
 
-        // Drei Säulen in steigender Höhe.
+        // Drei Säulen in steigender Höhe, von Blau nach Violett.
         double barWidth = s * 0.136;
         double gap = s * 0.072;
         double totalWidth = 3 * barWidth + 2 * gap;
         double left = (s - totalWidth) / 2.0;
         double baseline = s * 0.775;
         double[] heights = {s * 0.22, s * 0.355, s * 0.49};
+        Color[] barColors = {ACCENT, ACCENT_BRIGHT, VIOLET};
         double barRadius = barWidth * 0.42;
 
-        g.setColor(WHITE);
         for (int i = 0; i < 3; i++) {
             double x = left + i * (barWidth + gap);
             double height = heights[i];
+            g.setPaint(barColors[i]);
             g.fill(new RoundRectangle2D.Double(x, baseline - height, barWidth, height,
                     barRadius, barRadius));
         }
 
         // Die Genügend-Linie, wie im Diagramm.
         double lineHeight = Math.max(1.5, s * 0.026);
+        g.setPaint(WHITE);
         g.fill(new RoundRectangle2D.Double(left - gap, baseline, totalWidth + 2 * gap, lineHeight,
                 lineHeight, lineHeight));
 

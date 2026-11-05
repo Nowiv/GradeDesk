@@ -1,0 +1,86 @@
+/*
+ * Theme: alle Farben von GradeDesk an einer Stelle.
+ *
+ * JavaFX kennt "looked-up colors": ein Name, der mit -gd- beginnt, wird hier
+ * einmal definiert und in app.css überall sonst nur noch referenziert. Wer die
+ * Anwendung umfärben will, ändert ausschliesslich diese Datei.
+ *
+ * Die Welt ist dunkel: tiefes Marineblau als Grund, Panels aus halbdurchsichtigem
+ * Licht, Blau als Akzent, Violett als zweite Stimme.
+ */
+
+.root {
+
+    /* --- Grund ------------------------------------------------------------
+     * Drei Ebenen: der tiefste Ton trägt das Fenster, darüber liegen zwei
+     * Lichtschleier, die dem Hintergrund Tiefe geben.
+     */
+    -gd-bg-deep: #05070f;
+    -gd-bg: #0a0f1f;
+    -gd-bg-raised: #111730;
+
+    -gd-glow-blue: rgba(62, 139, 255, 0.26);
+    -gd-glow-violet: rgba(139, 92, 246, 0.22);
+    -gd-glow-cyan: rgba(56, 189, 248, 0.14);
+
+    /* --- Flächen ----------------------------------------------------------
+     * Panels sind nicht gefüllt, sondern aufgehellt: eine dünne weisse Schicht
+     * über dem Grund. Dadurch nehmen sie den Schimmer des Hintergrunds auf.
+     */
+    -gd-surface: rgba(255, 255, 255, 0.045);
+    -gd-surface-strong: rgba(255, 255, 255, 0.075);
+    -gd-surface-hover: rgba(255, 255, 255, 0.07);
+    -gd-surface-sunken: rgba(0, 0, 0, 0.22);
+    -gd-border: rgba(255, 255, 255, 0.09);
+    -gd-border-strong: rgba(255, 255, 255, 0.17);
+
+    /* --- Akzent ------------------------------------------------------------ */
+    -gd-accent: #3e8bff;
+    -gd-accent-bright: #5ba3ff;
+    -gd-accent-dim: #2f6fd8;
+    -gd-accent-wash: rgba(62, 139, 255, 0.16);
+    -gd-accent-wash-strong: rgba(62, 139, 255, 0.26);
+    -gd-violet: #8b5cf6;
+    -gd-violet-wash: rgba(139, 92, 246, 0.18);
+
+    /* --- Text -------------------------------------------------------------- */
+    -gd-text: #eef2fb;
+    -gd-text-muted: #9aa6c4;
+    -gd-text-faint: #6b7696;
+    -gd-text-on-accent: #ffffff;
+
+    /* --- Notenfarben -------------------------------------------------------
+     * Diese Farben bedeuten ausschliesslich Notenwerte und sind unabhängig von
+     * der Akzentfarbe zu lesen. Auf dunklem Grund ist die Reihe gegenüber einem
+     * hellen Thema aufgehellt: ein sattes Dunkelgrün verschwände hier, deshalb
+     * steigt die Reihe von zartem zu kräftigem Grün, ohne ins Schwarze zu gehen.
+     */
+    -gd-grade-insufficient: #ff5d5d;
+    -gd-grade-40: #b8ecc6;
+    -gd-grade-45: #86dda3;
+    -gd-grade-50: #4fca84;
+    -gd-grade-55: #28b06a;
+    -gd-grade-60: #119159;
+
+    /* --- Rückmeldungen ------------------------------------------------------ */
+    -gd-warning: #fbbf4b;
+    -gd-warning-wash: rgba(251, 191, 75, 0.14);
+    -gd-success: #4fca84;
+    -gd-danger: #ff5d5d;
+    -gd-danger-wash: rgba(255, 93, 93, 0.14);
+
+    /* --- Diagramm ------------------------------------------------------------ */
+    -gd-chart-grid: rgba(255, 255, 255, 0.08);
+    -gd-chart-plot: rgba(255, 255, 255, 0.025);
+    -gd-chart-threshold: #e7ecf8;
+
+    /* --- Schrift -------------------------------------------------------------- */
+    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Inter", "Noto Sans", sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -gd-text;
+
+    /* Fokusring der Plattform abschalten; app.css zeichnet einen eigenen. */
+    -fx-focus-color: -gd-accent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: -gd-bg;
+}

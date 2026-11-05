@@ -25,15 +25,15 @@ jobs:
         include:
           - os: windows-latest
             label: Windows
-            artifact: notenrechner-windows
+            artifact: gradedesk-windows
             pattern: target/installer/*.msi
           - os: macos-latest
             label: macOS
-            artifact: notenrechner-macos
+            artifact: gradedesk-macos
             pattern: target/installer/*.dmg
           - os: ubuntu-latest
             label: Linux
-            artifact: notenrechner-linux
+            artifact: gradedesk-linux
             pattern: target/installer/*.deb
 
     steps:
