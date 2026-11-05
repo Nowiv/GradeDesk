@@ -27,7 +27,7 @@ import java.util.function.LongConsumer;
  */
 public final class UpdateService {
     public static final String OWNER = "Nowiv";
-    public static final String REPOSITORY = "GradeHub";
+    public static final String REPOSITORY = "GradeDesk";
 
     private static final URI LATEST_API = URI.create(
             "https://api.github.com/repos/" + OWNER + "/" + REPOSITORY + "/releases/latest");
