@@ -70,6 +70,7 @@ public final class GradeDeskApp extends Application {
         stage.setTitle(I18n.t("app.name"));
         stage.setMinWidth(1060);
         stage.setMinHeight(660);
+        stage.setMaximized(true);
         stage.getIcons().add(new Image(icon()));
         stage.show();
 
