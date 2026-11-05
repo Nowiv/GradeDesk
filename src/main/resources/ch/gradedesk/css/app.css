@@ -1,0 +1,1294 @@
+/*
+ * Gestaltung von GradeDesk – Windows-11-Explorer-Stil.
+ *
+ * Haltung:
+ *
+ *   1. Die App soll sich anfuehlen wie ein Windows-Fenster, nicht wie eine
+ *      Webseite: Segoe UI, Windows-Typoskala (12 / 14 / 20 / 28 px),
+ *      4 px Radien fuer Bedienelemente, 8 px fuer Ueberlagerungen.
+ *   2. Zwei Ebenen wie in Explorer und Einstellungen: Navigationsbereich
+ *      auf "Mica"-Grau, der Inhalt liegt auf einem hellen Layer mit runder
+ *      Ecke oben links.
+ *   3. Navigation mit Auswahlmarke: kurzer Akzentstrich links in der Zeile.
+ *   4. Listen und Tabellen wie der Explorer: keine Zeilenlinien,
+ *      hellblaue Hover- und Auswahlflaeche mit feiner Kante.
+ *   5. Eingabefelder mit dunkler Unterkante; bei Fokus wird sie zur
+ *      2 px Akzentlinie. Tastaturfokus als schwarzer/weisser Rahmen.
+ *   6. Notenfarben (rot/gruen) bleiben Signal, getrennt vom Blau.
+ *
+ * Alle Farben kommen aus theme.css bzw. theme-dark.css.
+ * Alle Klassennamen sind unveraendert – FXML und Java bleiben, wie sie sind.
+ *
+ * Tastaturfokus nutzt :focus-visible (ab JavaFX 19). Bei aelterem JavaFX
+ * ":focus-visible" durch ":focused" ersetzen.
+ */
+
+/* ======================================================================
+ * Grundgeruest
+ * ====================================================================== */
+
+.app-shell {
+    -fx-background-color: -ui-bg-sidebar;
+}
+
+/* ----------------------------------------------------------------------
+ * Navigationsbereich: Mica-Flaeche ohne Trennlinie. Die Trennung entsteht
+ * durch die Kante des Inhalts-Layers (siehe .content).
+ * -------------------------------------------------------------------- */
+
+.sidebar-dock {
+    -fx-padding: 0;
+}
+
+.sidebar {
+    -fx-background-color: -ui-bg-sidebar;
+    -fx-min-width: 264px;
+    -fx-pref-width: 264px;
+    -fx-max-width: 264px;
+    -fx-padding: 14px 8px 10px 8px;
+}
+
+.sidebar__brand {
+    -fx-padding: 6px 12px 18px 12px;
+    -fx-spacing: 0;
+}
+
+.sidebar__wordmark {
+    -fx-spacing: 0;
+}
+
+.sidebar__wordmark-prefix,
+.sidebar__wordmark-suffix {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.sidebar__wordmark-suffix {
+    -fx-text-fill: -ui-accent;
+}
+
+.sidebar__tagline {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-tertiary;
+}
+
+.sidebar__nav {
+    -fx-spacing: 2px;
+}
+
+.sidebar__footer {
+    -fx-padding: 12px 12px 4px 12px;
+    -fx-spacing: 6px;
+}
+
+.sidebar__section-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+    -fx-padding: 14px 0 2px 0;
+}
+
+/*
+ * Navigationszeile.
+ * Ebene 1: Flaeche. Ebene 2: Akzentstrich (3 x 16 px), nur bei Auswahl
+ * sichtbar. Ebene 3 deckt den Strich rechts davon wieder ab.
+ * Weil alles ueber Hintergrund-Ebenen laeuft, verschiebt sich nichts.
+ */
+.nav-button {
+    -fx-background-color: transparent, transparent, transparent;
+    -fx-background-insets: 0, 8px 0 8px 0, 0 0 0 3px;
+    -fx-background-radius: 4px, 2px, 0 4px 4px 0;
+    -fx-min-height: 34px;
+    -fx-pref-height: 34px;
+    -fx-max-height: 34px;
+    -fx-max-width: Infinity;
+    -fx-padding: 0 12px 0 14px;
+    -fx-graphic-text-gap: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: LEFT;
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 14px;
+    -fx-cursor: default;
+}
+
+.nav-button:hover {
+    -fx-background-color: -ui-nav-hover, transparent, transparent;
+}
+
+.nav-button:pressed {
+    -fx-background-color: -ui-nav-active, transparent, transparent;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.nav-button:focus-visible {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+}
+
+.nav-button .nav-button__icon {
+    -fx-stroke: -ui-text-secondary;
+}
+
+.nav-button:hover .nav-button__icon {
+    -fx-stroke: -ui-text;
+}
+
+.nav-button--active,
+.nav-button--active:hover {
+    -fx-background-color: -ui-nav-active, -ui-accent, -ui-nav-active;
+    -fx-font-weight: 600;
+}
+
+.nav-button--active:hover {
+    -fx-background-color: -ui-nav-hover, -ui-accent, -ui-nav-hover;
+}
+
+.nav-button--active .nav-button__icon,
+.nav-button--active:hover .nav-button__icon {
+    -fx-stroke: -ui-text;
+}
+
+.save-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-graphic-text-gap: 8px;
+    -fx-wrap-text: true;
+}
+
+.save-status__dot {
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+    -fx-background-radius: 999px;
+    -fx-background-color: -ui-text-quaternary;
+}
+
+.save-status__dot--saved { -fx-background-color: -ui-pass; }
+.save-status__dot--pending { -fx-background-color: -ui-warn; }
+.save-status__dot--failed { -fx-background-color: -ui-fail; }
+
+.sidebar__path {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-tertiary;
+    -fx-wrap-text: true;
+}
+
+/* ----------------------------------------------------------------------
+ * Umschalter im Stil der Windows-SelectorBar: reine Textreiter,
+ * die Auswahl bekommt eine Akzentlinie darunter.
+ * -------------------------------------------------------------------- */
+
+.segmented {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-spacing: 4px;
+}
+
+.segmented__option {
+    -fx-background-color: transparent, transparent;
+    -fx-background-insets: 0, 29px 10px 0 10px;
+    -fx-background-radius: 4px, 2px;
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0 10px 2px 10px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-cursor: default;
+}
+
+.segmented__option:hover {
+    -fx-background-color: -ui-bg-hover, transparent;
+    -fx-text-fill: -ui-text;
+}
+
+.segmented__option:pressed {
+    -fx-background-color: -ui-bg-active, transparent;
+}
+
+.segmented__option:selected,
+.segmented__option:selected:hover {
+    -fx-background-color: transparent, -ui-accent;
+    -fx-text-fill: -ui-text;
+    -fx-font-weight: 600;
+}
+
+.segmented__option:selected:hover {
+    -fx-background-color: -ui-bg-hover, -ui-accent;
+}
+
+.segmented__option:focus-visible {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+}
+
+/* ----------------------------------------------------------------------
+ * Inhalts-Layer und Seitenkopf
+ * -------------------------------------------------------------------- */
+
+/*
+ * Wie die Inhaltsflaeche in Explorer/Einstellungen: heller Layer auf Mica,
+ * runde Ecke oben links, feine Kante oben und links.
+ */
+.content {
+    -fx-background-color: -ui-bg-sidebar, -ui-bg-base;
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 0, 8px 0 0 0;
+    -fx-border-color: -ui-layer-stroke transparent transparent -ui-layer-stroke;
+    -fx-border-width: 1px 0 0 1px;
+    -fx-border-radius: 8px 0 0 0;
+}
+
+/* Grosser Seitentitel wie in den Windows-Einstellungen, keine Linie darunter. */
+.page-header {
+    -fx-padding: 28px 36px 8px 36px;
+    -fx-spacing: 16px;
+    -fx-alignment: BOTTOM_LEFT;
+}
+
+.page-header__text {
+    -fx-spacing: 4px;
+}
+
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-wrap-text: true;
+}
+
+.page-body {
+    -fx-padding: 20px 36px 36px 36px;
+    -fx-spacing: 24px;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+/* Schmale Windows-11-Bildlaufleiste: duenn in Ruhe, breiter bei Hover. */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 2px;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: -ui-scroll-thumb;
+    -fx-background-insets: 0 3px 0 3px;
+    -fx-background-radius: 999px;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: -ui-scroll-thumb;
+    -fx-background-insets: 3px 0 3px 0;
+    -fx-background-radius: 999px;
+}
+
+.scroll-bar:vertical:hover .thumb {
+    -fx-background-insets: 0 1px 0 1px;
+}
+
+.scroll-bar:horizontal:hover .thumb {
+    -fx-background-insets: 1px 0 1px 0;
+}
+
+.scroll-bar .track,
+.scroll-bar .track-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button,
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-shape: null;
+}
+
+/* ======================================================================
+ * Karten: weiss auf hellem Layer, feine Kante, 4 px Radius
+ * ====================================================================== */
+
+.card {
+    -fx-background-color: -ui-bg-surface;
+    -fx-background-radius: 4px;
+    -fx-border-color: -ui-border;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+}
+
+/* Gruppenkopf wie im Explorer ("Geraete und Laufwerke"): Titel + Linie. */
+.group-header {
+    -fx-padding: 0 0 6px 0;
+    -fx-spacing: 10px;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-border-color: transparent transparent -ui-separator transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.group-header__title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.group-header__meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-tertiary;
+}
+
+/* Kartenkopf ohne Trennlinie – Gewicht und Abstand trennen genug. */
+.card__header {
+    -fx-padding: 16px 16px 4px 16px;
+    -fx-spacing: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.card__title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.card__meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.card__body {
+    -fx-padding: 12px 16px 16px 16px;
+    -fx-spacing: 12px;
+}
+
+.label-micro {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.label-caption {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.label-body {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+}
+
+.label-muted {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-wrap-text: true;
+}
+
+.label-faint {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-tertiary;
+}
+
+/* Pfade wie in der Explorer-Adresszeile: Segoe, nicht Monospace. */
+.label-path {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.settings__control {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+/* ----------------------------------------------------------------------
+ * Schaltflaechen – Windows-Standard: 32 px, 4 px Radius,
+ * Unterkante eine Spur dunkler (Elevation).
+ * -------------------------------------------------------------------- */
+
+.btn {
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 14px;
+    -fx-graphic-text-gap: 8px;
+    -fx-cursor: default;
+}
+
+.btn:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* Akzentschaltflaeche */
+.btn-filled {
+    -fx-background-color: -ui-accent;
+    -fx-text-fill: -ui-text-on-accent;
+    -fx-border-color: -ui-accent -ui-accent derive(-ui-accent, -28%) -ui-accent;
+}
+
+.btn-filled:hover {
+    -fx-background-color: -ui-accent-bright;
+    -fx-border-color: -ui-accent-bright -ui-accent-bright derive(-ui-accent, -28%) -ui-accent-bright;
+}
+
+.btn-filled:pressed {
+    -fx-background-color: -ui-accent-pressed;
+    -fx-border-color: -ui-accent-pressed;
+}
+
+.btn-filled .icon {
+    -fx-stroke: -ui-text-on-accent;
+}
+
+/* Standardschaltflaeche */
+.btn-tinted {
+    -fx-background-color: -ui-bg-raised;
+    -fx-text-fill: -ui-text;
+    -fx-border-color: -ui-stroke-control -ui-stroke-control -ui-stroke-control-bottom -ui-stroke-control;
+}
+
+.btn-tinted:hover {
+    -fx-background-color: -ui-control-hover;
+}
+
+.btn-tinted:pressed {
+    -fx-background-color: -ui-control-pressed;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-border-color: -ui-stroke-control;
+}
+
+.btn-tinted .icon {
+    -fx-stroke: -ui-text;
+}
+
+/* Unauffaellige Schaltflaeche (Befehlsleiste) */
+.btn-plain {
+    -fx-background-color: transparent;
+    -fx-text-fill: -ui-text;
+}
+
+.btn-plain:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.btn-plain:pressed {
+    -fx-background-color: -ui-bg-active;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.btn-plain .icon {
+    -fx-stroke: -ui-text;
+}
+
+/* Loeschen: Standardschaltflaeche mit rotem Text, rote Flaeche erst bei Hover. */
+.btn-destructive {
+    -fx-background-color: -ui-bg-raised;
+    -fx-text-fill: -ui-fail;
+    -fx-border-color: -ui-stroke-control -ui-stroke-control -ui-stroke-control-bottom -ui-stroke-control;
+}
+
+.btn-destructive:hover {
+    -fx-background-color: -ui-fail-wash;
+}
+
+.btn-destructive:pressed {
+    -fx-background-color: -ui-fail-wash;
+    -fx-border-color: -ui-stroke-control;
+}
+
+.btn-destructive .icon {
+    -fx-stroke: -ui-fail;
+}
+
+/* Tastaturfokus fuer alle Schaltflaechen: 2 px Rahmen ausserhalb. */
+.btn:focus-visible {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+    -fx-border-insets: -3px;
+    -fx-border-radius: 7px;
+}
+
+/* Symbolschaltflaeche, 32 px wie in der Explorer-Befehlsleiste. */
+.btn-quiet-icon {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0;
+    -fx-alignment: CENTER;
+    -fx-cursor: default;
+}
+
+.btn-quiet-icon:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.btn-quiet-icon:pressed {
+    -fx-background-color: -ui-bg-active;
+}
+
+.btn-quiet-icon:focus-visible {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+}
+
+.btn-quiet-icon:disabled {
+    -fx-opacity: 0.35;
+}
+
+.btn-quiet-icon .icon {
+    -fx-stroke: -ui-text-secondary;
+}
+
+.btn-quiet-icon:hover .icon {
+    -fx-stroke: -ui-text;
+}
+
+.btn-quiet-icon--danger:hover {
+    -fx-background-color: -ui-fail-wash;
+}
+
+.btn-quiet-icon--danger:hover .icon {
+    -fx-stroke: -ui-fail;
+}
+
+/* ----------------------------------------------------------------------
+ * Eingabefelder – Windows-TextBox:
+ * dunklere Unterkante; bei Fokus 2 px Akzentlinie (als Hintergrund-Ebene,
+ * damit sich der Text nicht verschiebt).
+ * -------------------------------------------------------------------- */
+
+.text-field,
+.combo-box-base {
+    -fx-background-color: -ui-bg-input;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-border-color: -ui-stroke-control -ui-stroke-control -ui-stroke-input-bottom -ui-stroke-control;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 11px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+    -fx-prompt-text-fill: -ui-text-tertiary;
+    -fx-highlight-fill: -ui-accent-wash;
+    -fx-highlight-text-fill: -ui-text;
+}
+
+.text-field:hover,
+.combo-box-base:hover {
+    -fx-background-color: -ui-control-hover;
+}
+
+.text-field:focused,
+.combo-box-base:focused,
+.combo-box-base:showing {
+    -fx-background-color: -ui-accent, -ui-bg-input-focus;
+    -fx-background-insets: 0, 0 0 2px 0;
+    -fx-background-radius: 4px, 4px 4px 0 0;
+    -fx-border-color: -ui-stroke-control -ui-stroke-control -ui-accent -ui-stroke-control;
+}
+
+.text-field--invalid,
+.text-field--invalid:focused,
+.date-picker.text-field--invalid {
+    -fx-background-color: -ui-fail, -ui-bg-input-focus;
+    -fx-background-insets: 0, 0 0 2px 0;
+    -fx-background-radius: 4px, 4px 4px 0 0;
+    -fx-border-color: -ui-stroke-control -ui-stroke-control -ui-fail -ui-stroke-control;
+}
+
+/* Der DatePicker ist selbst der Rahmen; das Textfeld darin ist unsichtbar. */
+.date-picker > .text-field,
+.date-picker > .text-field:hover,
+.date-picker > .text-field:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-min-height: 0;
+}
+
+.date-picker {
+    -fx-padding: 0 0 0 11px;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 4px 4px 0;
+    -fx-padding: 0 12px;
+}
+
+.date-picker > .arrow-button:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: -ui-text-secondary;
+}
+
+/* Kalender-Popup: Windows-Flyout mit 8 px Radius und weichem Schatten. */
+.date-picker-popup {
+    -fx-background-color: -ui-bg-overlay;
+    -fx-background-radius: 8px;
+    -fx-border-color: -ui-border-strong;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 24, 0, 0, 8);
+}
+
+.date-picker-popup > * > .month-year-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 8px 10px 8px;
+}
+
+.date-picker-popup > * > .month-year-pane .label {
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.date-picker-popup > * > .month-year-pane .button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+}
+
+.date-picker-popup > * > .month-year-pane .button:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.date-picker-popup > * > .month-year-pane .button > .left-arrow,
+.date-picker-popup > * > .month-year-pane .button > .right-arrow {
+    -fx-background-color: -ui-text-secondary;
+}
+
+.date-picker-popup > * > .calendar-grid {
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-name-cell,
+.date-picker-popup > * > .calendar-grid > .week-number-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-font-size: 12px;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-cell {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 999px;
+    -fx-text-fill: -ui-text;
+}
+
+.date-picker-popup > * > .calendar-grid > .day-cell:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+/* Heute: gefuellter Akzentkreis (Windows). Auswahl: Akzentring. */
+.date-picker-popup > * > .calendar-grid > .today {
+    -fx-background-color: -ui-accent;
+    -fx-text-fill: -ui-text-on-accent;
+}
+
+.date-picker-popup > * > .calendar-grid > .selected {
+    -fx-border-color: -ui-accent;
+    -fx-border-width: 2px;
+}
+
+.date-picker-popup > * > .calendar-grid > .next-month,
+.date-picker-popup > * > .calendar-grid > .previous-month {
+    -fx-text-fill: -ui-text-quaternary;
+}
+
+.field-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+}
+
+.field-hint {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.field-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-fail;
+    -fx-wrap-text: true;
+}
+
+/* ----------------------------------------------------------------------
+ * Notenband – wie die Laufwerksanzeige im Explorer: abgerundete Schiene
+ * ohne Kante, Fuellung in Notenfarbe.
+ * -------------------------------------------------------------------- */
+
+.grade-track {
+    -fx-min-height: 14px;
+    -fx-pref-height: 14px;
+    -fx-max-height: 14px;
+}
+
+.grade-track__rail {
+    -fx-background-color: -ui-track;
+    -fx-background-radius: 3px;
+}
+
+.grade-track__fill {
+    -fx-background-radius: 3px;
+}
+
+.grade-track__tick {
+    -fx-background-color: -ui-bg-surface;
+    -fx-opacity: 0.7;
+}
+
+.grade-track__threshold {
+    -fx-background-color: -ui-text;
+}
+
+.grade-track__marker {
+    -fx-background-radius: 999px;
+    -fx-border-color: -ui-bg-surface;
+    -fx-border-radius: 999px;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.22), 4, 0, 0, 1);
+}
+
+.grade-fill--insufficient { -fx-background-color: -ui-fail; }
+.grade-fill--40 { -fx-background-color: -ui-pass-light; }
+.grade-fill--45 { -fx-background-color: -ui-pass-mid; }
+.grade-fill--50 { -fx-background-color: -ui-pass-base; }
+.grade-fill--55 { -fx-background-color: -ui-pass-strong; }
+.grade-fill--60 { -fx-background-color: -ui-pass-deep; }
+
+/* ----------------------------------------------------------------------
+ * Notenwerte – Segoe UI hat gleichbreite Ziffern, Spalten fluchten auch
+ * ohne Monospace.
+ * -------------------------------------------------------------------- */
+
+.grade-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.grade-value--none {
+    -fx-text-fill: -ui-text-quaternary;
+}
+
+.grade-exact {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+/* Badges wie Windows-InfoBar: getoente Flaeche, farbiger Text, keine Kante. */
+.badge {
+    -fx-background-radius: 4px;
+    -fx-padding: 1px 8px 2px 8px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.badge--ok {
+    -fx-background-color: -ui-pass-wash;
+    -fx-text-fill: -ui-pass;
+}
+
+.badge--fail {
+    -fx-background-color: -ui-fail-wash;
+    -fx-text-fill: -ui-fail;
+}
+
+.badge--none {
+    -fx-background-color: -ui-bg-active;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+/* ----------------------------------------------------------------------
+ * Listenzeile – Explorer-Detailansicht: abgerundete Hover-Flaeche,
+ * Trennlinien nur eingerueckt und sehr leise.
+ * -------------------------------------------------------------------- */
+
+.module-row {
+    -fx-padding: 8px 16px;
+    -fx-spacing: 16px;
+    -fx-min-height: 44px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-background-color: transparent;
+    -fx-background-insets: 2px 4px 2px 4px;
+    -fx-background-radius: 4px;
+}
+
+.module-row:hover {
+    -fx-background-color: -ui-row-hover;
+}
+
+.row-separator {
+    -fx-background-color: -ui-separator;
+    -fx-background-insets: 0 16px 0 16px;
+    -fx-min-height: 1px;
+    -fx-pref-height: 1px;
+    -fx-max-height: 1px;
+}
+
+.module-row__name {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+}
+
+.module-row__count {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.module-summary {
+    -fx-padding: 14px 16px;
+    -fx-spacing: 16px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-background-color: -ui-bg-base;
+    -fx-background-radius: 4px 4px 0 0;
+    -fx-border-color: transparent transparent -ui-separator transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* ----------------------------------------------------------------------
+ * Listen und Tabellen
+ * -------------------------------------------------------------------- */
+
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 4px;
+}
+
+.list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 1px 0;
+    -fx-text-fill: -ui-text;
+}
+
+.picker-cell {
+    -fx-padding: 6px 12px;
+    -fx-spacing: 0;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+    -fx-min-height: 40px;
+    -fx-background-color: transparent;
+    -fx-cursor: default;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.picker-cell:hover {
+    -fx-background-color: -ui-row-hover;
+}
+
+/* Explorer-Auswahl: hellblaue Flaeche mit feiner blauer Kante. */
+.picker-cell--selected,
+.picker-cell--selected:hover {
+    -fx-background-color: -ui-selection;
+    -fx-border-color: -ui-selection-stroke;
+}
+
+.picker-cell__title {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+}
+
+.picker-cell__meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view > .virtual-flow > .corner {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -ui-separator transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* Spaltenkoepfe wie im Explorer: normale Schrift, feine senkrechte Teiler. */
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent -ui-separator transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-insets: 6px 0 6px 0;
+    -fx-size: 34px;
+    -fx-padding: 0 10px;
+}
+
+.table-view .filler {
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .column-header .arrow {
+    -fx-background-color: -ui-text-secondary;
+}
+
+/* Zeilen schweben als abgerundete Flaechen, keine Linien dazwischen. */
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 1px 4px 1px 4px;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-border-insets: 1px 4px 1px 4px;
+    -fx-border-radius: 4px;
+    -fx-cell-size: 36px;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: -ui-row-hover;
+}
+
+.table-view .table-row-cell:selected,
+.table-view .table-row-cell:selected:hover {
+    -fx-background-color: -ui-selection;
+    -fx-border-color: -ui-selection-stroke;
+}
+
+.table-view .table-row-cell:empty,
+.table-view .table-row-cell:empty:hover {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .table-cell {
+    -fx-padding: 0 10px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: -ui-text;
+}
+
+/* Zahlen rechtsbuendig – Segoe-Ziffern sind gleich breit. */
+.table-view .table-cell.table-cell--numeric {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.table-view .column-header.table-cell--numeric .label {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.table-view:focus-visible {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -ui-text-secondary;
+    -fx-font-size: 14px;
+}
+
+/* ----------------------------------------------------------------------
+ * Leere Zustaende und Hinweise
+ * -------------------------------------------------------------------- */
+
+.empty-state {
+    -fx-padding: 48px 32px;
+    -fx-spacing: 6px;
+    -fx-alignment: CENTER;
+}
+
+.empty-state--compact {
+    -fx-padding: 24px 20px;
+}
+
+.empty-state__title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.empty-state__text {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text-secondary;
+    -fx-wrap-text: true;
+    -fx-text-alignment: CENTER;
+    -fx-max-width: 420px;
+}
+
+.empty-state__action {
+    -fx-padding: 14px 0 0 0;
+}
+
+/* Kein Kasten ums Symbol – das Symbol steht frei, wie in Windows. */
+.empty-state__mark {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 10px 0;
+    -fx-max-width: -Infinity;
+    -fx-max-height: -Infinity;
+}
+
+.empty-state__mark .icon {
+    -fx-stroke: -ui-accent;
+}
+
+/* Hinweisleiste wie die Windows-InfoBar. */
+.banner {
+    -fx-background-radius: 4px;
+    -fx-padding: 12px 16px;
+    -fx-spacing: 12px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-border-color: -ui-border;
+}
+
+.banner--warning {
+    -fx-background-color: -ui-warn-wash;
+}
+
+.banner__text {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+    -fx-wrap-text: true;
+}
+
+.banner--warning .icon {
+    -fx-stroke: -ui-warn;
+}
+
+.icon--alert {
+    -fx-stroke: -ui-warn;
+}
+
+/* ======================================================================
+ * Diagramm
+ * ====================================================================== */
+
+.grade-chart-container {
+    -fx-padding: 16px 16px 4px 12px;
+}
+
+.grade-chart {
+    -fx-padding: 0;
+}
+
+.grade-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.grade-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.grade-chart .chart-horizontal-grid-lines {
+    -fx-stroke: -ui-separator;
+    -fx-stroke-width: 1px;
+}
+
+.grade-chart .chart-alternative-row-fill,
+.grade-chart .chart-alternative-column-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+.grade-chart .chart-horizontal-zero-line,
+.grade-chart .chart-vertical-zero-line {
+    -fx-stroke: transparent;
+}
+
+.grade-chart .axis {
+    -fx-tick-label-fill: -ui-text-secondary;
+    -fx-tick-label-font-size: 12px;
+    -fx-tick-mark-visible: false;
+    -fx-minor-tick-visible: false;
+}
+
+.grade-chart .axis:bottom {
+    -fx-border-color: -ui-separator transparent transparent transparent;
+}
+
+.grade-chart .axis:left {
+    -fx-border-color: transparent;
+}
+
+.grade-chart .axis .axis-label {
+    -fx-text-fill: -ui-text-secondary;
+    -fx-font-size: 12px;
+}
+
+.grade-chart .chart-bar {
+    -fx-bar-fill: -ui-pass-base;
+    -fx-background-radius: 2px 2px 0 0;
+    -fx-background-insets: 0;
+}
+
+.grade-chart .chart-bar.bar--insufficient { -fx-bar-fill: -ui-fail; }
+.grade-chart .chart-bar.bar--40 { -fx-bar-fill: -ui-pass-light; }
+.grade-chart .chart-bar.bar--45 { -fx-bar-fill: -ui-pass-mid; }
+.grade-chart .chart-bar.bar--50 { -fx-bar-fill: -ui-pass-base; }
+.grade-chart .chart-bar.bar--55 { -fx-bar-fill: -ui-pass-strong; }
+.grade-chart .chart-bar.bar--60 { -fx-bar-fill: -ui-pass-deep; }
+
+/* Bestehensgrenze gestrichelt – unterscheidet sich klar vom Raster. */
+.chart-threshold-line {
+    -fx-stroke: -ui-text;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 4 3;
+}
+
+.chart-semester-divider {
+    -fx-stroke: -ui-separator;
+    -fx-stroke-width: 1px;
+}
+
+.chart-semester-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-fill: -ui-text-secondary;
+}
+
+.chart-threshold-caption {
+    -fx-font-size: 12px;
+    -fx-fill: -ui-text;
+}
+
+.chart-legend-bar {
+    -fx-padding: 4px 16px 16px 16px;
+    -fx-background-color: transparent;
+}
+
+.chart-legend-swatch {
+    -fx-min-width: 12px;
+    -fx-min-height: 12px;
+    -fx-max-width: 12px;
+    -fx-max-height: 12px;
+    -fx-background-radius: 2px;
+}
+
+.chart-legend-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+/* ======================================================================
+ * Dialoge – Windows-ContentDialog: helle Inhaltsflaeche,
+ * Schaltflaechenleiste auf Mica mit Trennlinie.
+ * ====================================================================== */
+
+.dialog-pane {
+    -fx-background-color: -ui-bg-surface;
+    -fx-background-radius: 8px;
+    -fx-border-color: -ui-border-strong;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+}
+
+.dialog-pane > .header-panel {
+    -fx-background-color: transparent;
+    -fx-padding: 24px 24px 4px 24px;
+}
+
+.dialog-pane > .header-panel > .label {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+    -fx-wrap-text: true;
+}
+
+.dialog-pane > .content,
+.dialog-pane > .content.label {
+    -fx-background-color: transparent;
+    -fx-padding: 12px 24px 24px 24px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text;
+    -fx-wrap-text: true;
+}
+
+.dialog-pane > .button-bar {
+    -fx-background-color: -ui-bg-sidebar;
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-border-color: -ui-border transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 24px;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-spacing: 8px;
+}
+
+.dialog-form {
+    -fx-spacing: 16px;
+    -fx-padding: 4px 0;
+}
+
+.dialog-form__field {
+    -fx-spacing: 6px;
+}
+
+.dialog-form__row {
+    -fx-spacing: 12px;
+}
+
+/* ======================================================================
+ * Hilfselemente
+ * ====================================================================== */
+
+.tooltip {
+    -fx-background-color: -ui-bg-overlay;
+    -fx-background-radius: 4px;
+    -fx-border-color: -ui-border-strong;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 8px 7px 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.16), 12, 0, 0, 4);
+}
+
+.icon {
+    -fx-stroke: -ui-text-secondary;
+}
