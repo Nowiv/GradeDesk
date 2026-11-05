@@ -4,110 +4,56 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>GradeHub</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>GradeHub</name>
+    <groupId>ch.notenrechner</groupId>
+    <artifactId>notenrechner</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Notenrechner</name>
+    <description>Lokale Desktop-Anwendung zum Erfassen und Auswerten von Schulnoten (Schweizer Notenskala 1-6).</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.12.1</junit.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+
+        <javafx.version>21.0.6</javafx.version>
+        <jackson.version>2.18.2</jackson.version>
+        <junit.version>5.11.4</junit.version>
+
+        <app.module>ch.notenrechner</app.module>
+        <app.mainClass>ch.notenrechner.NotenrechnerApp</app.mainClass>
+        <app.launcher>Notenrechner</app.launcher>
+        <app.runtimeImage>runtime</app.runtimeImage>
+        <app.vendor>Notenrechner</app.vendor>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>21.0.6</version>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>21.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.controlsfx</groupId>
-            <artifactId>controlsfx</artifactId>
-            <version>11.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dlsc.formsfx</groupId>
-            <artifactId>formsfx-core</artifactId>
-            <version>11.6.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.synedra</groupId>
-            <artifactId>validatorfx</artifactId>
-            <version>0.6.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-javafx</artifactId>
-            <version>12.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kordamp.bootstrapfx</groupId>
-            <artifactId>bootstrapfx-core</artifactId>
-            <version>0.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.hansolo</groupId>
-            <artifactId>tilesfx</artifactId>
-            <version>21.0.9</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.github.almasb</groupId>
-            <artifactId>fxgl</artifactId>
-            <version>17.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
@@ -119,31 +65,158 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
                 <configuration>
-                    <source>25</source>
-                    <target>25</target>
+                    <!-- Tests laufen auf dem Classpath. Der Produktivcode bleibt modular,
+                         die Tests brauchen dadurch kein eigenes module-info.java. -->
+                    <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>org.example.gradehub/org.example.gradehub.HelloApplication</mainClass>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
-                            <stripDebug>true</stripDebug>
-                            <noHeaderFiles>true</noHeaderFiles>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <mainClass>${app.module}/${app.mainClass}</mainClass>
+                    <launcher>${app.launcher}</launcher>
+                    <jlinkImageName>${app.runtimeImage}</jlinkImageName>
+                    <jlinkZipName>${app.runtimeImage}</jlinkZipName>
+                    <noManPages>true</noManPages>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <stripDebug>true</stripDebug>
+                    <compress>2</compress>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Native Installer bauen: mvn -Pinstaller clean package
+             Erzeugt zuerst ein jlink-Runtime-Image und verpackt dieses danach mit jpackage. -->
+        <profile>
+            <id>installer</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openjfx</groupId>
+                        <artifactId>javafx-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-runtime-image</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jlink</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>1.6.5</version>
+                        <executions>
+                            <execution>
+                                <id>create-installer</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jpackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <name>Notenrechner</name>
+                            <appVersion>${project.version}</appVersion>
+                            <vendor>${app.vendor}</vendor>
+                            <copyright>${app.vendor}</copyright>
+                            <runtimeImage>${project.build.directory}/${app.runtimeImage}</runtimeImage>
+                            <module>${app.module}/${app.mainClass}</module>
+                            <destination>${project.build.directory}/installer</destination>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>installer-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <configuration>
+                            <type>MSI</type>
+                            <icon>packaging/windows/Notenrechner.ico</icon>
+                            <winMenu>true</winMenu>
+                            <winMenuGroup>Notenrechner</winMenuGroup>
+                            <winShortcut>true</winShortcut>
+                            <winDirChooser>true</winDirChooser>
+                            <winPerUserInstall>true</winPerUserInstall>
+                            <winUpgradeUuid>9f1d8c54-3b47-4a2e-9c6f-2f0b7d51ae31</winUpgradeUuid>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>installer-macos</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <configuration>
+                            <type>DMG</type>
+                            <icon>packaging/macos/Notenrechner.icns</icon>
+                            <macPackageName>Notenrechner</macPackageName>
+                            <macPackageIdentifier>ch.notenrechner.app</macPackageIdentifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>installer-linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <configuration>
+                            <type>DEB</type>
+                            <icon>packaging/linux/Notenrechner.png</icon>
+                            <linuxShortcut>true</linuxShortcut>
+                            <linuxMenuGroup>Education</linuxMenuGroup>
+                            <linuxPackageName>notenrechner</linuxPackageName>
+                            <linuxDebMaintainer>notenrechner@localhost</linuxDebMaintainer>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
