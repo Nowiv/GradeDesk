@@ -1,10 +1,11 @@
+
 name: Release
 
-# Baut auf jedem Versions-Tag (z.B. v1.0.0) native Installer für Windows, macOS
-# und Linux und hängt sie an den GitHub-Release.
+# Builds native installers for Windows, macOS and Linux
+# whenever a version tag (e.g. v1.0.0) is pushed.
 #
-# Jeder Installer bringt über jlink seine eigene Java-Runtime mit. Wer die
-# Anwendung installiert, braucht kein Java auf dem Rechner.
+# Each installer includes its own Java runtime created with jlink.
+# Users do not need to install Java separately.
 
 on:
   push:
@@ -17,8 +18,9 @@ permissions:
 
 jobs:
   build:
-    name: Installer für ${{ matrix.label }}
+    name: Build installer for ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -27,39 +29,46 @@ jobs:
             label: Windows
             artifact: gradedesk-windows
             pattern: target/installer/*.msi
+
           - os: macos-latest
             label: macOS
             artifact: gradedesk-macos
             pattern: target/installer/*.dmg
+
           - os: ubuntu-latest
             label: Linux
             artifact: gradedesk-linux
             pattern: target/installer/*.deb
 
     steps:
-      - name: Quellcode auschecken
+      - name: Check out source code
         uses: actions/checkout@v4
 
-      - name: JDK 21 einrichten
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
 
-      - name: Werkzeuge für das Debian-Paket
+      - name: Install WiX Toolset
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: choco install wixtoolset --no-progress -y
+
+      - name: Install tools for Debian packaging
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install --yes fakeroot binutils
 
-      - name: Tests ausführen
+      - name: Run tests
         run: ./mvnw --batch-mode verify
         shell: bash
 
-      - name: Installer bauen
+      - name: Build installer
         run: ./mvnw --batch-mode -Pinstaller -DskipTests package
         shell: bash
 
-      - name: Installer hochladen
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
@@ -67,29 +76,33 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: Release veröffentlichen
+    name: Publish GitHub Release
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Installer einsammeln
+      - name: Download installers
         uses: actions/download-artifact@v4
         with:
           path: installer
           merge-multiple: true
 
-      - name: Release erstellen
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: installer/*
           draft: false
           generate_release_notes: true
           body: |
-            Native Installer für Windows, macOS und Linux. Eine eigene
-            Java-Runtime ist jeweils enthalten, eine Java-Installation ist
-            nicht nötig.
+            Native installers for Windows, macOS and Linux.
 
-            Die Installer sind nicht signiert. Windows zeigt deshalb eine
-            SmartScreen-Warnung, macOS eine Gatekeeper-Warnung. Wie man sie
-            bestätigt, steht in der README.
+            Each installer includes its own Java runtime.
+            No separate Java installation is required.
+
+            **Note:** The installers are currently unsigned.
+            Windows may display a SmartScreen warning, while macOS
+            may display a Gatekeeper warning.
+
+            Instructions for handling these warnings are available
+            in the README.

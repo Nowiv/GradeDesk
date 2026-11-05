@@ -1,109 +1,94 @@
-# Notenrechner
+# Grade Calculator
 
-Eine lokale Desktop-Anwendung zum Erfassen und Auswerten von Schulnoten nach der
-Schweizer Notenskala (1.0 bis 6.0, genügend ab 4.0).
+A local desktop application for recording and analyzing school grades using the Swiss grading scale (1.0 to 6.0, with 4.0 as the passing grade).
 
-Die Noten werden nach **Semester → Modul → Note** strukturiert. Die Anwendung
-rechnet den gewichteten Modulschnitt, rundet ihn kaufmännisch auf eine halbe Note
-und bildet daraus den Semesterschnitt. Jede Änderung wird sofort gespeichert.
+Grades are organized by **Semester → Module → Grade**. The application calculates the weighted module average, rounds it commercially to the nearest half grade, and calculates the semester average. Every change is saved automatically.
 
-**Die Anwendung ist rein lokal.** Keine Netzwerkverbindung, kein Konto, kein
-Cloud-Abgleich, keine Telemetrie, keine Export- oder Teilen-Funktion.
+**The application runs entirely locally.** No network connection, account, cloud synchronization, telemetry, export, or sharing functionality.
 
 ---
 
-## Inhalt
+## Table of Contents
 
-- [Funktionen](#funktionen)
-- [Fachliche Regeln](#fachliche-regeln)
-- [Wo die Daten liegen](#wo-die-daten-liegen)
-- [Lokal starten](#lokal-starten)
+- [Features](#features)
+- [Grading Rules](#grading-rules)
+- [Where Your Data Is Stored](#where-your-data-is-stored)
+- [Running Locally](#running-locally)
 - [Tests](#tests)
-- [Installer lokal bauen](#installer-lokal-bauen)
-- [Release über GitHub erstellen](#release-über-github-erstellen)
-- [Warnungen bei unsignierten Installern](#warnungen-bei-unsignierten-installern)
-- [Aufbau des Projekts](#aufbau-des-projekts)
-- [Erweitern](#erweitern)
+- [Building Installers Locally](#building-installers-locally)
+- [Creating a Release on GitHub](#creating-a-release-on-github)
+- [Warnings for Unsigned Installers](#warnings-for-unsigned-installers)
+- [Project Structure](#project-structure)
+- [Extending the Application](#extending-the-application)
 
 ---
 
-## Funktionen
+## Features
 
-- Semester, Module und Noten anlegen, bearbeiten und löschen (Löschen immer mit
-  Bestätigung, die benennt, was verloren geht)
-- Übersicht pro Semester mit allen Modulen, Modulnote, ungerundetem Durchschnitt
-  und genügend/ungenügend-Status
-- Säulendiagramm aller Modulnoten, nach Semester gruppiert, mit fixer Y-Achse
-  von 1 bis 6, Referenzlinien bei jeder ganzen Note und hervorgehobener
-  Genügend-Grenze bei 4.0
-- Automatisches Speichern nach jeder Änderung, atomar und mit Backup
-- Vollständige Tastaturbedienung, frei skalierbares Fenster
+- Create, edit, and delete semesters, modules, and grades (deletions always require confirmation explaining what data will be lost)
+- Overview of each semester, including all modules, module grades, unrounded averages, and pass/fail status
+- Bar chart displaying all module grades, grouped by semester, with a fixed Y-axis ranging from 1 to 6, reference lines at every whole grade, and a highlighted passing threshold at 4.0
+- Automatic saving after every change, using atomic writes and backups
+- Full keyboard navigation and a freely resizable window
 
-## Fachliche Regeln
+## Grading Rules
 
-| Regel | Verhalten |
+| Rule | Behavior |
 |---|---|
-| Notenskala | 1.0 bis 6.0; 1.0 ist die schlechteste, 6.0 die beste Note |
-| Genügend | ab 4.0 |
-| Ungültige Eingabe | Werte ausserhalb 1.0–6.0 werden mit einer klaren Meldung abgelehnt |
-| Gewichtung | Standard 1.0, frei wählbar, muss grösser als 0 sein |
-| Modulnote | gewichteter Durchschnitt, kaufmännisch auf 0.5 gerundet |
-| Rundungsbeispiele | 4.24 → 4.0, 4.25 → 4.5, 4.74 → 4.5, 4.75 → 5.0 |
-| Ungerundeter Wert | wird überall zusätzlich angezeigt |
-| Semesterschnitt | Durchschnitt der **gerundeten** Modulnoten |
-| Modul ohne Noten | zeigt «–» und fliesst in keine Berechnung ein |
+| Grading scale | 1.0 to 6.0; 1.0 is the lowest and 6.0 is the highest grade |
+| Passing grade | 4.0 or higher |
+| Invalid input | Values outside 1.0–6.0 are rejected with a clear error message |
+| Weighting | Default: 1.0; freely configurable, must be greater than 0 |
+| Module grade | Weighted average, commercially rounded to the nearest 0.5 |
+| Rounding examples | 4.24 → 4.0, 4.25 → 4.5, 4.74 → 4.5, 4.75 → 5.0 |
+| Unrounded value | Also displayed everywhere |
+| Semester average | Average of the **rounded** module grades |
+| Module without grades | Displays "–" and is excluded from all calculations |
 
-Gerechnet wird durchgehend mit `BigDecimal` und `RoundingMode.HALF_UP`, nie mit
-`double`. Damit entstehen keine Gleitkomma-Rundungsfehler.
+All calculations consistently use `BigDecimal` and `RoundingMode.HALF_UP`, never `double`. This prevents floating-point rounding errors.
 
-## Wo die Daten liegen
+## Where Your Data Is Stored
 
-Die Noten liegen im Benutzerprofil, **nicht** im Installationsordner. Dadurch
-bleiben sie bei Updates und Neuinstallationen erhalten, und jeder
-Betriebssystem-Benutzer hat automatisch seine eigenen Daten.
+Grades are stored in the user's profile, **not** in the installation directory. This ensures that data is preserved across updates and reinstalls, and that each operating system user automatically has their own data.
 
-| System | Verzeichnis |
+| Operating System | Directory |
 |---|---|
 | Windows | `%APPDATA%\Notenrechner\` |
 | macOS | `~/Library/Application Support/Notenrechner/` |
-| Linux | `~/.local/share/notenrechner/` (bzw. `$XDG_DATA_HOME`) |
+| Linux | `~/.local/share/notenrechner/` (or `$XDG_DATA_HOME`) |
 
-Darin:
+The directory contains:
 
-- `noten.json` – der aktuelle Stand, mit Schema-Version für spätere Migrationen
-- `noten.backup.json` – der zuletzt gültige Stand
-- `noten.beschaedigt-<Zeitstempel>.json` – entsteht nur, wenn eine Datei nicht
-  gelesen werden konnte; sie wird beiseitegelegt statt überschrieben
+- `noten.json` – the current data, including a schema version for future migrations
+- `noten.backup.json` – the last valid version of the data
+- `noten.beschaedigt-<timestamp>.json` – created only when a file cannot be read; the file is moved aside instead of being overwritten
 
-Beim Speichern wird zuerst vollständig in eine temporäre Datei geschrieben, dann
-die bisherige Datei zum Backup gemacht und erst danach die neue an ihre Stelle
-verschoben. Ein Absturz mitten im Speichern kann deshalb keinen halben Stand
-hinterlassen. Ist die Hauptdatei beschädigt, lädt die Anwendung beim Start
-automatisch das Backup und sagt es.
+When saving, the application first writes the complete data to a temporary file, then moves the previous file to the backup location, and only afterwards moves the new file into place. This prevents an interrupted save operation from leaving behind an incomplete data file.
 
-Den genauen Pfad zeigt die Anwendung unter **Einstellungen**.
+If the main file is corrupted, the application automatically loads the backup when starting and informs the user.
 
-## Lokal starten
+The exact storage path is displayed under **Settings**.
 
-Voraussetzung: **JDK 21** oder neuer. Maven wird über den mitgelieferten Wrapper
-bezogen, eine Maven-Installation ist nicht nötig.
+## Running Locally
+
+Requirement: **JDK 21** or newer. Maven is provided through the included Maven Wrapper, so a separate Maven installation is not required.
 
 ```bash
 # Windows
 mvnw.cmd javafx:run
 
-# macOS und Linux
+# macOS and Linux
 ./mvnw javafx:run
 ```
 
-Zeigt `java -version` eine ältere Version, auf JDK 21 umstellen:
+If `java -version` shows an older version, switch to JDK 21:
 
 ```bash
 # Windows (PowerShell)
 $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21"
 
-# macOS und Linux
-export JAVA_HOME=/pfad/zum/jdk-21
+# macOS and Linux
+export JAVA_HOME=/path/to/jdk-21
 ```
 
 ## Tests
@@ -112,38 +97,31 @@ export JAVA_HOME=/pfad/zum/jdk-21
 ./mvnw test
 ```
 
-Abgedeckt sind die Rundung inklusive der Grenzfälle 4.24 / 4.25 / 4.74 / 4.75,
-die Gewichtung, die Eingabeprüfung, das Speichern und Laden, das Backup und die
-Wiederherstellung aus einer beschädigten Datei.
+The tests cover rounding, including the boundary cases 4.24 / 4.25 / 4.74 / 4.75, weighting, input validation, saving and loading, backups, and recovery from corrupted files.
 
-## Installer lokal bauen
+## Building Installers Locally
 
-`jpackage` erzeugt für das jeweils laufende Betriebssystem einen nativen
-Installer, der über `jlink` eine eigene Java-Runtime mitbringt. **Empfänger
-brauchen kein Java.** Ein Installer lässt sich immer nur auf der Zielplattform
-bauen – ein Windows-Installer also nur unter Windows.
+`jpackage` creates a native installer for the operating system currently in use. Each installer includes its own Java runtime created with `jlink`. **Users do not need to install Java separately.**
+
+An installer can only be built on its target platform – for example, a Windows installer must be built on Windows.
 
 ```bash
 ./mvnw -Pinstaller clean package
 ```
 
-Das Ergebnis liegt in `target/installer/`:
+The resulting files are located in `target/installer/`:
 
-| System | Datei | Zusätzlich nötig |
+| Operating System | File | Additional Requirements |
 |---|---|---|
-| Windows | `Notenrechner-1.0.0.msi` (Startmenü- und Desktop-Verknüpfung) | [WiX Toolset 3.x](https://github.com/wixtoolset/wix3/releases) |
+| Windows | `Notenrechner-1.0.0.msi` (Start Menu and desktop shortcuts) | [WiX Toolset 3.x](https://github.com/wixtoolset/wix3/releases) |
 | macOS | `Notenrechner-1.0.0.dmg` | – |
 | Linux | `notenrechner_1.0.0_amd64.deb` | `fakeroot`, `binutils` |
 
-Das Programmsymbol liegt als Platzhalter in Rot/Weiss unter `packaging/`. Es
-lässt sich mit `java packaging/IconGenerator.java` neu erzeugen – wer ein eigenes
-Symbol will, ersetzt entweder die Dateien oder passt den Generator an.
+The application icon is provided as a red-and-white placeholder in `packaging/`. It can be regenerated using `java packaging/IconGenerator.java`. To use a custom icon, either replace the files or modify the generator.
 
-## Release über GitHub erstellen
+## Creating a Release on GitHub
 
-Der Workflow `.github/workflows/release.yml` baut bei jedem Versions-Tag auf
-`windows-latest`, `macos-latest` und `ubuntu-latest` und hängt die Installer als
-Assets an den GitHub-Release.
+The workflow `.github/workflows/release.yml` builds installers for `windows-latest`, `macos-latest`, and `ubuntu-latest` whenever a version tag is pushed. The installers are then attached to the corresponding GitHub Release.
 
 ```bash
 git tag v1.0.0
@@ -151,124 +129,114 @@ git push origin main
 git push origin v1.0.0
 ```
 
-Danach entsteht unter *Releases* automatisch ein Eintrag mit `.msi`, `.dmg` und
-`.deb`. Der Workflow lässt sich zum Ausprobieren auch von Hand über
-*Actions → Release → Run workflow* starten; dann entsteht kein Release, die
-Installer liegen aber als Artefakte zum Herunterladen bereit.
+Afterwards, a new entry is automatically created under *Releases*, containing the `.msi`, `.dmg`, and `.deb` installers.
 
-Die Versionsnummer steht in `pom.xml` unter `<version>` und muss zum Tag passen.
+For testing purposes, the workflow can also be started manually via *Actions → Release → Run workflow*. In this case, no GitHub Release is created, but the installers are available as downloadable workflow artifacts.
 
-## Warnungen bei unsignierten Installern
+The version number is defined in `pom.xml` under `<version>` and must match the Git tag.
 
-Die Installer sind nicht mit einem Zertifikat signiert. Das ist kein Fehler,
-sondern der normale Zustand ohne gekauftes Code-Signing-Zertifikat. Beide
-Systeme zeigen deshalb eine Warnung:
+## Warnings for Unsigned Installers
 
-- **Windows (SmartScreen):** «Der Computer wurde durch Windows geschützt.»
-  → *Weitere Informationen* → *Trotzdem ausführen*.
-- **macOS (Gatekeeper):** «Notenrechner kann nicht geöffnet werden, da der
-  Entwickler nicht verifiziert werden kann.» → Im Finder mit der rechten
-  Maustaste auf die App → *Öffnen* → im Dialog nochmals *Öffnen*. Alternativ
-  unter *Systemeinstellungen → Datenschutz & Sicherheit → Dennoch öffnen*.
-- **Linux:** keine Warnung.
+The installers are not signed with a certificate. This is not an error; it is the normal situation when no paid code-signing certificate is available.
 
-Wer die Warnung vermeiden will, braucht ein Code-Signing-Zertifikat (Windows)
-bzw. eine Apple-Developer-ID samt Notarisierung (macOS).
+As a result, both operating systems may display a security warning:
 
-## Aufbau des Projekts
+- **Windows (SmartScreen):** "Windows protected your PC."
+  → Select *More info* → *Run anyway*.
 
-```
+- **macOS (Gatekeeper):** "Notenrechner cannot be opened because the developer cannot be verified."
+  → In Finder, right-click the application → *Open* → confirm by selecting *Open* again. Alternatively, go to *System Settings → Privacy & Security → Open Anyway*.
+
+- **Linux:** No warning.
+
+To avoid these warnings, a code-signing certificate is required for Windows, while macOS requires an Apple Developer ID and notarization.
+
+## Project Structure
+
+```text
 src/main/java/ch/notenrechner/
-├── NotenrechnerApp.java        Einstiegspunkt, verdrahtet alle Bausteine
-├── model/                      Datenmodell mit JavaFX-Properties
+├── NotenrechnerApp.java        Application entry point, connects all components
+├── model/                      Data model with JavaFX properties
 │   ├── GradeBook, Semester, CourseModule, Grade
-├── service/                    Fachlogik, ohne jede UI-Abhängigkeit
-│   ├── GradeCalculator         Durchschnitt und Rundung (BigDecimal)
-│   ├── GradeScale              die Skala 1.0–6.0
-│   ├── GradeValidator          Eingabeprüfung mit anzeigbaren Meldungen
-│   ├── GradeBookService        Anlegen, Ändern, Löschen
-│   └── AutoSaveService         automatisches Speichern
-├── persistence/                Ablage hinter einem Interface
-│   ├── GradeRepository         das Interface
-│   ├── JsonGradeRepository     JSON-Datei, atomar, mit Backup
-│   ├── AppPaths                Datenverzeichnis je Betriebssystem
-│   ├── GradeBookMapper         Modell ↔ Datei
-│   ├── SchemaMigrator          Migration älterer Dateiformate
-│   └── dto/                    Serialisierungsform (Records)
-└── ui/                         FXML, Controller und Hilfsklassen
-    ├── MainController          Seitenleiste und Ansichtswechsel
-    ├── Views                   Liste der Ansichten (Erweiterungspunkt)
-    ├── view/                   die vier Ansichten
-    ├── chart/GradeBarChart     das Säulendiagramm
-    ├── control/                Notenband und Dialoge
-    └── util/                   Formatierung, Symbole, Theme
+├── service/                    Business logic, without UI dependencies
+│   ├── GradeCalculator         Average and rounding (BigDecimal)
+│   ├── GradeScale              Grading scale 1.0–6.0
+│   ├── GradeValidator          Input validation with user-friendly messages
+│   ├── GradeBookService        Create, update, and delete operations
+│   └── AutoSaveService         Automatic saving
+├── persistence/                Data storage behind an interface
+│   ├── GradeRepository         Repository interface
+│   ├── JsonGradeRepository     JSON storage, atomic writes, backups
+│   ├── AppPaths                OS-specific data directories
+│   ├── GradeBookMapper         Model ↔ file mapping
+│   ├── SchemaMigrator          Migration of older file formats
+│   └── dto/                    Serialization objects (records)
+└── ui/                         FXML, controllers, and helper classes
+    ├── MainController          Sidebar and view navigation
+    ├── Views                   List of views (extension point)
+    ├── view/                   The four application views
+    ├── chart/GradeBarChart     Bar chart
+    ├── control/                Grade scale and dialogs
+    └── util/                   Formatting, icons, theme
 ```
 
-```
+```text
 src/main/resources/ch/notenrechner/
-├── css/theme.css               alle Farben an einer Stelle
-├── css/app.css                 die Gestaltung
-├── ui/*.fxml                   Grundgerüst und Ansichten
-└── icon/                       Programmsymbol
+├── css/theme.css               All colors in one place
+├── css/app.css                 Application styling
+├── ui/*.fxml                   Layout and views
+└── icon/                       Application icon
 ```
 
-Die Trennung ist strikt: `model` und `service` kennen kein JavaFX-UI,
-`persistence` kennt nur das Modell, und im Java- und FXML-Code steht kein
-einziges Inline-Styling – die Oberfläche wird ausschliesslich über Stilklassen
-und CSS gestaltet.
+The separation of responsibilities is strict: `model` and `service` have no knowledge of the JavaFX UI, `persistence` only knows about the model, and neither the Java nor FXML code contains any inline styling. The entire interface is styled exclusively through CSS classes and stylesheets.
 
-Die gestalterischen Entscheide stehen in [DESIGN.md](DESIGN.md), die
-Produktfestlegungen in [PRODUCT.md](PRODUCT.md).
+Design decisions are documented in [DESIGN.md](DESIGN.md), while product specifications are documented in [PRODUCT.md](PRODUCT.md).
 
-## Erweitern
+## Extending the Application
 
-### Eine neue Ansicht ergänzen
+### Adding a New View
 
-Die Seitenleiste wird aus einer Liste erzeugt. Eine zusätzliche Ansicht braucht
-drei Dinge und keinen Umbau am Bestehenden:
+The sidebar is generated from a list. Adding another view requires only three steps and does not require changes to the existing architecture:
 
-1. **FXML anlegen** unter `src/main/resources/ch/notenrechner/ui/view/`, zum
-   Beispiel `statistik-view.fxml`. Als Vorlage dient `overview-view.fxml`: oben
-   ein `page-header`, darunter der Inhalt.
-2. **Controller schreiben** in `ch.notenrechner.ui.view`, der
-   `ViewController` umsetzt:
+1. **Create an FXML file** under `src/main/resources/ch/notenrechner/ui/view/`, for example `statistics-view.fxml`. Use `overview-view.fxml` as a template: a `page-header` at the top, followed by the content.
+
+2. **Create a controller** in `ch.notenrechner.ui.view` that implements `ViewController`:
 
    ```java
-   public final class StatistikController implements ViewController {
+   public final class StatisticsController implements ViewController {
        @Override
        public void init(AppServices services) {
-           // services.gradeBook() liefert den Service mit dem Modell
+           // services.gradeBook() provides the service containing the model
        }
    }
    ```
 
-3. **Eintrag ergänzen** in `ch.notenrechner.ui.Views#entries()`:
+3. **Add an entry** to `ch.notenrechner.ui.Views#entries()`:
 
    ```java
-   new NavigationEntry("statistik", "Statistik", Icons.CHART,
-           BASE + "statistik-view.fxml", StatistikController::new)
+   
+    new NavigationEntry("statistics", "Statistics", Icons.CHART,
+BASE + "statistics-view.fxml", StatisticsController::new)
    ```
 
-Die Schaltfläche in der Seitenleiste, das Laden, das Zwischenspeichern der
-Ansicht und der Wechsel entstehen daraus von selbst. Wird im Controller ein
-neues Symbol gebraucht, kommt der SVG-Pfad in `ui/util/Icons`.
+The sidebar button, loading, view state preservation, and navigation are generated automatically. If the controller requires a new icon, add the SVG path to `ui/util/Icons`.
 
-### Die Farben ändern
+### Changing the Colors
 
-Alle Farben stehen als Variablen in
-`src/main/resources/ch/notenrechner/css/theme.css`. Dort genügt es, die Werte zu
-ändern; im übrigen Code steht kein einziger Farbwert.
+All colors are defined as variables in:
 
-### Eine andere Speicherart einbauen
+`src/main/resources/ch/notenrechner/css/theme.css`
 
-`GradeRepository` ist das einzige, was die Anwendung von der Ablage kennt. Für
-eine SQLite-Variante genügt eine zweite Implementierung dieses Interface; in
-`NotenrechnerApp` wird dann statt `new JsonGradeRepository()` die neue Klasse
-eingesetzt. UI und Services bleiben unverändert.
+Simply change the values there. No color values are hardcoded anywhere else in the code.
 
-### Das Dateiformat erweitern
+### Changing the Storage Implementation
 
-`GradeBookDto.CURRENT_SCHEMA_VERSION` erhöhen und in `SchemaMigrator#migrate`
-einen Schritt ergänzen, der von der Vorgängerversion übersetzt. Dateien mit einer
-höheren Version als die installierte Anwendung werden bewusst nicht geöffnet,
-damit eine ältere Programmversion keine Daten verliert.
+`GradeRepository` is the only interface through which the application interacts with its storage system.
+
+To implement SQLite storage, simply create a second implementation of this interface. In `NotenrechnerApp`, replace `new JsonGradeRepository()` with the new class. The UI and services remain unchanged.
+
+### Extending the File Format
+
+Increase `GradeBookDto.CURRENT_SCHEMA_VERSION` and add a migration step to `SchemaMigrator#migrate` that converts data from the previous version.
+
+Files with a higher schema version than the installed application supports are deliberately not opened. This prevents older application versions from accidentally losing data.

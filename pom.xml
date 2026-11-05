@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -10,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>GradeDesk</name>
-    <description>Lokale Desktop-Anwendung zum Erfassen und Auswerten von Schulnoten (Schweizer Notenskala 1-6).</description>
+    <description>Local desktop application for recording and analyzing school grades using the Swiss grading scale (1-6).</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,8 +63,8 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- Die Version hier, damit sie auch in den betriebssystemabhängigen
-                     Profilen gilt, die das Plugin nur noch konfigurieren. -->
+                <!-- Define the plugin version here so that it is also used
+                     by the operating-system-specific profiles. -->
                 <plugin>
                     <groupId>org.panteleyev</groupId>
                     <artifactId>jpackage-maven-plugin</artifactId>
@@ -84,8 +85,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
-                    <!-- Tests laufen auf dem Classpath. Der Produktivcode bleibt modular,
-                         die Tests brauchen dadurch kein eigenes module-info.java. -->
+                    <!-- Run tests on the classpath. The production code
+                         remains modular, without requiring a separate
+                         module-info.java for the tests. -->
                     <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
@@ -109,8 +111,9 @@
     </build>
 
     <profiles>
-        <!-- Native Installer bauen: mvn -Pinstaller clean package
-             Erzeugt zuerst ein jlink-Runtime-Image und verpackt dieses danach mit jpackage. -->
+        <!-- Build native installers using: mvn -Pinstaller clean package
+             First creates a custom runtime image with jlink, then packages
+             the application with jpackage. -->
         <profile>
             <id>installer</id>
             <build>
@@ -154,6 +157,7 @@
             </build>
         </profile>
 
+        <!-- Windows installer configuration -->
         <profile>
             <id>installer-windows</id>
             <activation>
@@ -181,6 +185,7 @@
             </build>
         </profile>
 
+        <!-- macOS installer configuration -->
         <profile>
             <id>installer-macos</id>
             <activation>
@@ -204,6 +209,7 @@
             </build>
         </profile>
 
+        <!-- Linux installer configuration -->
         <profile>
             <id>installer-linux</id>
             <activation>
