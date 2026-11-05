@@ -1,16 +1,16 @@
-module org.example.gradehub {
+/**
+ * Notenrechner: lokale Desktop-Anwendung zum Erfassen und Auswerten von Schulnoten.
+ *
+ * <p>Das Modul ist bewusst eng geschnitten: es öffnet nur, was JavaFX für FXML
+ * und Jackson für die Serialisierung wirklich braucht. Dadurch lassen sich mit
+ * jlink und jpackage schlanke, in sich geschlossene Installer erzeugen.</p>
+ */
+module ch.notenrechner {
     requires javafx.controls;
     requires javafx.fxml;
-    requires javafx.web;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.datatype.jsr310;
 
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-    requires com.almasb.fxgl.all;
-
-    opens org.example.gradehub to javafx.fxml;
-    exports org.example.gradehub;
+    exports ch.notenrechner.model;
+    exports ch.notenrechner.service;
 }
