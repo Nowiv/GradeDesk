@@ -123,12 +123,21 @@ jobs:
 
       - name: Generate SHA-256 checksums
         shell: bash
+        working-directory: installer
         run: |
-          cd installer
-          find . -maxdepth 1 -type f \( -name '*.msi' -o -name '*.dmg' -o -name '*.deb' \) -print0 \
+          # Plain file names without a "./" prefix, so that anyone who puts
+          # SHA256SUMS.txt next to the installers can run
+          # "sha256sum -c SHA256SUMS.txt" without editing the file first.
+          find . -maxdepth 1 -type f \( -name '*.msi' -o -name '*.dmg' -o -name '*.deb' \) \
+            -printf '%P\0' \
             | sort -z \
             | xargs -0 -r sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
+
+          # Read the installers back and fail before publishing if a checksum
+          # disagrees, for example after a truncated artifact download.
+          sha256sum -c SHA256SUMS.txt
+          cat SHA256SUMS.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
