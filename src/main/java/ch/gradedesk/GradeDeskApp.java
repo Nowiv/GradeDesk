@@ -67,7 +67,7 @@ public final class GradeDeskApp extends Application {
         MainController controller = loader.getController();
         UpdateService updateService = new UpdateService();
         controller.init(new AppServices(service, autoSave, updateService,
-                new UpdateUi(updateService, settings), settings));
+                new UpdateUi(updateService, settings, autoSave::flush), settings));
 
         Scene scene = new Scene(root, 1240, 800);
         Theme.apply(scene);

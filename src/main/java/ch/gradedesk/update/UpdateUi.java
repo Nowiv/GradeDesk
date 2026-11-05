@@ -23,10 +23,16 @@ import java.util.Optional;
 public final class UpdateUi {
     private final UpdateService service;
     private final SettingsStore settings;
+    private final Runnable saveBeforeExit;
 
-    public UpdateUi(UpdateService service, SettingsStore settings) {
+    /**
+     * @param saveBeforeExit writes pending changes to disk; called right before
+     *                       the application exits for a Windows update
+     */
+    public UpdateUi(UpdateService service, SettingsStore settings, Runnable saveBeforeExit) {
         this.service = service;
         this.settings = settings;
+        this.saveBeforeExit = saveBeforeExit;
     }
 
     public void check(Window owner, boolean automatic) {
@@ -116,19 +122,25 @@ public final class UpdateUi {
         dialog.show();
     }
 
-    private void handOff(Window owner, Path installer) throws IOException, InterruptedException {
+    private void handOff(Window owner, Path installer) throws IOException {
         String os = System.getProperty("os.name", "").toLowerCase();
         if (os.contains("win")) {
-            String appPath = System.getProperty("jpackage.app-path");
-            Process process = new ProcessBuilder("msiexec", "/i", installer.toAbsolutePath().toString(), "/passive", "/norestart").start();
-            Thread restart = new Thread(() -> {
-                try {
-                    if (process.waitFor() == 0 && appPath != null && !appPath.isBlank()) new ProcessBuilder(appPath).start();
-                } catch (Exception ignored) { }
-            }, "gradedesk-update-restart");
-            restart.setDaemon(false);
-            restart.start();
+            // Start the helper first. If it cannot run, the application has to
+            // stay alive and report the failure instead of exiting into a
+            // half-finished update.
+            WindowsInstallerHandoff.start(installer,
+                    System.getProperty("jpackage.app-path"),
+                    WindowsInstallerHandoff.logFile());
+
+            // The helper is now waiting for this process, so anything unsaved
+            // has to reach the disk before it goes away.
+            saveBeforeExit.run();
+
+            // Platform.exit() on its own leaves the JVM running as long as any
+            // non-daemon thread exists, and a live GradeDesk.exe is exactly what
+            // blocks the MSI. System.exit makes the exit unconditional.
             Platform.exit();
+            System.exit(0);
             return;
         }
         if (os.contains("mac") || os.contains("darwin")) {
