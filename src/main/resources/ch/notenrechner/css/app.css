@@ -655,7 +655,7 @@
 .table-view .filler {
     -fx-background-color: transparent;
     -fx-size: 36px;
-    -fx-padding: 0 10px;
+    -fx-padding: 0 8px;
 }
 
 .table-view .column-header .label {
@@ -692,7 +692,7 @@
 }
 
 .table-view .table-cell {
-    -fx-padding: 0 10px;
+    -fx-padding: 0 8px;
     -fx-font-size: 13.5px;
     -fx-text-fill: -nr-text;
     -fx-alignment: CENTER_LEFT;
