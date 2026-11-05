@@ -1,5 +1,7 @@
 package ch.gradedesk.update;
 
+import ch.gradedesk.persistence.AppPaths;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +38,9 @@ final class WindowsInstallerHandoff {
     static final String ENV_MSI = "GRADEDESK_UPDATE_MSI";
     static final String ENV_APP = "GRADEDESK_UPDATE_APP";
     static final String ENV_LOG = "GRADEDESK_UPDATE_LOG";
+
+    /** Name of the verbose msiexec log inside the application's data directory. */
+    static final String LOG_FILE_NAME = "update-install.log";
 
     /** Exit code of msiexec meaning "installed, but Windows wants a reboot". */
     private static final int ERROR_SUCCESS_REBOOT_REQUIRED = 3010;
@@ -155,17 +160,23 @@ final class WindowsInstallerHandoff {
         return values;
     }
 
-    /** Where msiexec writes its verbose log, so a failed install stays diagnosable. */
+    /**
+     * Where msiexec writes its verbose log, so a failed install stays diagnosable.
+     *
+     * <p>Deliberately the application's data directory and not
+     * {@code %LOCALAPPDATA%\GradeDesk}: with {@code winPerUserInstall} that is
+     * the installation directory, so the log would sit inside the very folder
+     * the MSI replaces. A log that can vanish along with the failure it
+     * documents is worth nothing. The data directory belongs to the application,
+     * Windows Installer never touches it, and the log ends up next to
+     * {@code grades.json} and {@code settings.json} where it can be found.</p>
+     */
     static Path logFile() {
-        return logFile(System.getenv("LOCALAPPDATA"),
-                Path.of(System.getProperty("user.home", ".")));
+        return logFile(AppPaths.dataDirectory());
     }
 
-    /** Testable variant of {@link #logFile()} with an explicitly supplied environment. */
-    static Path logFile(String localAppData, Path userHome) {
-        Path base = localAppData == null || localAppData.isBlank()
-                ? userHome.resolve("AppData").resolve("Local")
-                : Path.of(localAppData);
-        return base.resolve("GradeDesk").resolve("update-install.log");
+    /** Testable variant of {@link #logFile()} with an explicit data directory. */
+    static Path logFile(Path dataDirectory) {
+        return dataDirectory.resolve(LOG_FILE_NAME);
     }
 }

@@ -1,5 +1,6 @@
 package ch.gradedesk.update;
 
+import ch.gradedesk.persistence.AppPaths;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class WindowsInstallerHandoffTest {
 
@@ -125,21 +127,29 @@ class WindowsInstallerHandoffTest {
         assertEquals(first, WindowsInstallerHandoff.command());
     }
 
-    @Test void logGoesToLocalAppData() {
-        Path home = Path.of("C_home");
-        Path local = Path.of("C_local");
-
-        assertEquals(local.resolve("GradeDesk").resolve("update-install.log"),
-                WindowsInstallerHandoff.logFile(local.toString(), home));
+    @Test void logGoesIntoTheGivenDataDirectory(@TempDir Path data) {
+        assertEquals(data.resolve(WindowsInstallerHandoff.LOG_FILE_NAME),
+                WindowsInstallerHandoff.logFile(data));
     }
 
-    @Test void logFallsBackToTheUserProfileWhenLocalAppDataIsMissing() {
-        Path home = Path.of("C_home");
-        Path expected = home.resolve("AppData").resolve("Local")
-                .resolve("GradeDesk").resolve("update-install.log");
+    @Test void logSitsNextToGradesAndSettings() {
+        assertEquals(AppPaths.dataDirectory().resolve(WindowsInstallerHandoff.LOG_FILE_NAME),
+                WindowsInstallerHandoff.logFile());
+    }
 
-        assertAll(
-                () -> assertEquals(expected, WindowsInstallerHandoff.logFile(null, home)),
-                () -> assertEquals(expected, WindowsInstallerHandoff.logFile("  ", home)));
+    /**
+     * Regression guard: a per-user MSI installs into %LOCALAPPDATA%\GradeDesk, so
+     * the log must not live there -- it would sit inside the folder the installer
+     * replaces and could disappear with the failure it is meant to document.
+     */
+    @Test void logStaysOutOfTheWindowsInstallationDirectory() {
+        String localAppData = System.getenv("LOCALAPPDATA");
+        assumeTrue(localAppData != null && !localAppData.isBlank(),
+                "LOCALAPPDATA only exists on Windows");
+
+        Path installationDirectory = Path.of(localAppData).resolve("GradeDesk");
+
+        assertFalse(WindowsInstallerHandoff.logFile().startsWith(installationDirectory),
+                "the msiexec log must not be written into the installation directory");
     }
 }
