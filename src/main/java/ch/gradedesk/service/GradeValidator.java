@@ -81,6 +81,24 @@ public final class GradeValidator {
     }
 
     /**
+     * Prüft eine freiwillige Bezeichnung.
+     *
+     * <p>Leer ist hier ein gültiger Zustand: eine geplante Prüfung ist oft
+     * zuerst nur ein Datum. Die Längenbeschränkung gilt trotzdem.</p>
+     *
+     * @param text die Eingabe, darf {@code null} oder leer sein
+     * @return der getrimmte Text, möglicherweise leer
+     * @throws ValidationException wenn der Text zu lang ist
+     */
+    public static String requireValidOptionalText(String text) {
+        String trimmed = text == null ? "" : text.trim();
+        if (trimmed.length() > MAX_TEXT_LENGTH) {
+            throw new ValidationException(ERR_TEXT_TOO_LONG, MAX_TEXT_LENGTH);
+        }
+        return trimmed;
+    }
+
+    /**
      * Prüft ein Datum.
      *
      * @throws ValidationException wenn kein Datum gesetzt ist

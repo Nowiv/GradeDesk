@@ -8,6 +8,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Einheitliche Darstellung von Noten, Gewichtungen und Daten im UI.
@@ -77,6 +79,55 @@ public final class Formats {
     /** Ein Datum im Format der eingestellten Sprache. */
     public static String date(LocalDate date) {
         return date == null ? none() : dateFormatter().format(date);
+    }
+
+    /**
+     * Ein Datum mit vorangestelltem Wochentag, z.B. «Di, 12.11.2026».
+     *
+     * <p>Der Wochentag steht dort, weil eine Prüfung im Kopf an einem Wochentag
+     * stattfindet und nicht an einem Datum.</p>
+     */
+    public static String dateWithWeekday(LocalDate date) {
+        if (date == null) {
+            return none();
+        }
+        String weekday = date.getDayOfWeek()
+                .getDisplayName(TextStyle.SHORT, I18n.getLanguage().locale());
+        // Je nach Sprache endet die Kurzform auf einen Punkt («Di.»); in der
+        // Zeile daneben steht bereits ein Komma, der Punkt stört dort nur.
+        if (weekday.endsWith(".")) {
+            weekday = weekday.substring(0, weekday.length() - 1);
+        }
+        return weekday + ", " + date(date);
+    }
+
+    /**
+     * Wie weit eine geplante Prüfung entfernt ist: «heute», «morgen»,
+     * «in 6 Tagen» – oder «Note ausstehend», wenn der Termin vorbei ist.
+     *
+     * @param date  der Prüfungstermin
+     * @param today der heutige Tag, von aussen gegeben, damit das prüfbar bleibt
+     */
+    public static String examDue(LocalDate date, LocalDate today) {
+        if (date == null) {
+            return none();
+        }
+        long days = ChronoUnit.DAYS.between(today, date);
+        if (days < 0) {
+            return I18n.t("plannedExam.pending");
+        }
+        if (days == 0) {
+            return I18n.t("plannedExam.today");
+        }
+        if (days == 1) {
+            return I18n.t("plannedExam.tomorrow");
+        }
+        return I18n.t("plannedExam.inDays", days);
+    }
+
+    /** «1 geplante Prüfung» / «3 geplante Prüfungen» / «keine geplante Prüfung». */
+    public static String plannedExamCount(int count) {
+        return I18n.t("count.plannedExams", count);
     }
 
     /** «genügend», «ungenügend» oder «keine Note». */

@@ -1035,6 +1035,83 @@
 }
 
 /* ----------------------------------------------------------------------
+ * Geplante Pruefungen: eine ruhige Zeile zwischen Modulnote und
+ * Notentabelle. Sie traegt Information, keine Flaeche – deshalb keine
+ * eigene Karte, nur eine Trennlinie nach unten.
+ * -------------------------------------------------------------------- */
+
+.planned-exams {
+    -fx-padding: 0;
+    -fx-border-color: transparent transparent -ui-separator transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.planned-exam {
+    -fx-padding: 7px 12px 7px 16px;
+    -fx-spacing: 12px;
+    -fx-min-height: 40px;
+}
+
+.planned-exam:hover {
+    -fx-background-color: -ui-row-hover;
+}
+
+/* Ohne geplante Pruefung bleibt nur der Link; die Zeile darf dann leiser sein. */
+.planned-exam--empty {
+    -fx-padding: 2px 12px 6px 12px;
+    -fx-spacing: 10px;
+}
+
+.planned-exam__next {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -ui-text;
+}
+
+.planned-exam__when {
+    -fx-font-size: 14px;
+    -fx-text-fill: -ui-text-secondary;
+}
+
+/* Zeile 1: Termin und Stand. Das Abzeichen behaelt seine Breite. */
+.planned-exam__line {
+    -fx-spacing: 10px;
+}
+
+/* Zeile 2: Bezeichnung und Gewichtung, leiser als der Termin. */
+.planned-exam__detail {
+    -fx-font-size: 12px;
+    -fx-text-fill: -ui-text-tertiary;
+}
+
+.planned-exam__actions {
+    -fx-spacing: 2px;
+}
+
+.planned-exam__add {
+    -fx-text-fill: -ui-accent;
+    -fx-graphic-text-gap: 6px;
+}
+
+.planned-exam__add .icon {
+    -fx-stroke: -ui-accent;
+}
+
+/* Schaltflaeche in Zeilenhoehe: 28 statt 32 px. */
+.btn--compact {
+    -fx-min-height: 28px;
+    -fx-pref-height: 28px;
+    -fx-padding: 0 10px;
+    -fx-font-size: 13px;
+}
+
+/* Abzeichen fuer "Note ausstehend": Warnfarbe, aber immer mit Wort daneben. */
+.badge--warn {
+    -fx-background-color: -ui-warn-wash;
+    -fx-text-fill: -ui-warn;
+}
+
+/* ----------------------------------------------------------------------
  * Listen und Tabellen
  * -------------------------------------------------------------------- */
 

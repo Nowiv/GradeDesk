@@ -1,6 +1,10 @@
 package ch.gradedesk.persistence;
 
 import ch.gradedesk.persistence.dto.GradeBookDto;
+import ch.gradedesk.persistence.dto.ModuleDto;
+import ch.gradedesk.persistence.dto.SemesterDto;
+
+import java.util.List;
 
 /**
  * Bringt eine geladene Datei auf das aktuelle Dateiformat.
@@ -9,6 +13,10 @@ import ch.gradedesk.persistence.dto.GradeBookDto;
  * weiterer Schritt hinzu, der die Daten von der Vorgängerversion übersetzt. Dateien
  * einer neueren Version als der Anwendung werden bewusst nicht geöffnet, damit eine
  * ältere Programmversion keine Daten verliert.</p>
+ *
+ * <p>Die Schritte laufen nacheinander: eine Datei der Version 1 geht durch jeden
+ * Schritt bis zur aktuellen Version, nicht direkt ans Ziel. So bleibt jeder
+ * Schritt für sich klein und prüfbar.</p>
  */
 public final class SchemaMigrator {
 
@@ -29,7 +37,33 @@ public final class SchemaMigrator {
                     + GradeBookDto.CURRENT_SCHEMA_VERSION + ".");
         }
 
-        // Version 1 ist das aktuelle Format: hier sind noch keine Schritte nötig.
-        return new GradeBookDto(GradeBookDto.CURRENT_SCHEMA_VERSION, dto.semesters());
+        List<SemesterDto> semesters = dto.semesters();
+
+        if (version < 2) {
+            semesters = addPlannedExams(semesters);
+            version = 2;
+        }
+
+        return new GradeBookDto(GradeBookDto.CURRENT_SCHEMA_VERSION, semesters);
+    }
+
+    /**
+     * Version 1 → 2: geplante Prüfungen kommen dazu.
+     *
+     * <p>Eine Datei der Version 1 kennt sie nicht, also beginnt jedes Modul mit
+     * einer leeren Liste. Es geht nichts verloren, und der Schritt steht
+     * trotzdem ausdrücklich hier – sonst wäre beim nächsten Formatwechsel nicht
+     * mehr zu sehen, wann das Feld dazugekommen ist.</p>
+     */
+    private static List<SemesterDto> addPlannedExams(List<SemesterDto> semesters) {
+        return semesters.stream()
+                .filter(semester -> semester != null)
+                .map(semester -> new SemesterDto(semester.id(), semester.name(),
+                        semester.modules().stream()
+                                .filter(module -> module != null)
+                                .map(module -> new ModuleDto(module.id(), module.name(),
+                                        module.grades(), List.of()))
+                                .toList()))
+                .toList();
     }
 }

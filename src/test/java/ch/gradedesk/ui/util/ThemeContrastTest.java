@@ -116,7 +116,10 @@ class ThemeContrastTest {
             new Combination("Notenband 5.5 gegen Schiene", "-ui-pass-strong", "-ui-track", ELEMENT),
             new Combination("Notenband 6.0 gegen Schiene", "-ui-pass-deep", "-ui-track", ELEMENT),
             new Combination("Notenband ungenuegend gegen Schiene", "-ui-fail", "-ui-track", ELEMENT),
-            new Combination("Grenzlinie 4.0 im Diagramm", "-ui-text", "-ui-bg-surface", ELEMENT));
+            new Combination("Grenzlinie 4.0 im Diagramm", "-ui-text", "-ui-bg-surface", ELEMENT),
+            new Combination("Abzeichen Note ausstehend", "-ui-warn", "-ui-warn-wash", TEXT),
+            new Combination("Link Pruefung eintragen", "-ui-accent", "-ui-bg-surface", TEXT),
+            new Combination("Gewichtung der geplanten Pruefung", "-ui-text-tertiary", "-ui-bg-surface", TEXT));
 
     @Test
     @DisplayName("Beide Paletten führen genau dieselben Variablen")

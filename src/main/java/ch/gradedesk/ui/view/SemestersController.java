@@ -3,6 +3,7 @@ package ch.gradedesk.ui.view;
 import ch.gradedesk.i18n.I18n;
 import ch.gradedesk.model.CourseModule;
 import ch.gradedesk.model.Grade;
+import ch.gradedesk.model.PlannedExam;
 import ch.gradedesk.model.Semester;
 import ch.gradedesk.service.GradeBookService;
 import ch.gradedesk.service.GradeValidator;
@@ -11,6 +12,7 @@ import ch.gradedesk.ui.ViewController;
 import ch.gradedesk.ui.control.Dialogs;
 import ch.gradedesk.ui.control.GradeDialog;
 import ch.gradedesk.ui.control.GradeTrack;
+import ch.gradedesk.ui.control.PlannedExamDialog;
 import ch.gradedesk.ui.util.Formats;
 import ch.gradedesk.ui.util.Icons;
 import javafx.beans.InvalidationListener;
@@ -30,10 +32,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -73,6 +78,8 @@ public final class SemestersController implements ViewController {
     private Label gradesMetaLabel;
     @FXML
     private HBox moduleGradeBox;
+    @FXML
+    private VBox plannedExamBox;
 
     @FXML
     private Button addSemesterButton;
@@ -376,6 +383,177 @@ public final class SemestersController implements ViewController {
         }
     }
 
+    // ----- Geplante Prüfungen ----------------------------------------------
+
+    /**
+     * Baut die Zeile der geplanten Prüfungen neu auf.
+     *
+     * <p>Sie steht zwischen Modulnote und Notentabelle, also genau dort, wo die
+     * Noten erfasst werden. Ohne geplante Prüfung bleibt nur ein leiser Link
+     * stehen; die Zeile verschwindet nie ganz, damit der Weg dorthin bekannt
+     * bleibt.</p>
+     */
+    private void refreshPlannedExams(CourseModule module) {
+        plannedExamBox.getChildren().clear();
+        boolean present = module != null;
+        plannedExamBox.setVisible(present);
+        plannedExamBox.setManaged(present);
+        if (!present) {
+            return;
+        }
+
+        List<PlannedExam> exams = module.plannedExamsByDate();
+        LocalDate today = LocalDate.now();
+        for (int i = 0; i < exams.size(); i++) {
+            plannedExamBox.getChildren().add(plannedExamRow(module, exams.get(i), i == 0, today));
+        }
+        plannedExamBox.getChildren().add(addExamRow(module, exams.isEmpty()));
+    }
+
+    /**
+     * Eine Zeile je geplanter Prüfung; die erste ist die nächste anstehende.
+     *
+     * <p>Zwei Textzeilen: oben der Termin, darunter Stand, Bezeichnung und
+     * Gewichtung. Alles nebeneinander ginge sich in einem schmalen Fenster
+     * nicht aus, und dann verschwände ausgerechnet der Termin. So behält die
+     * obere Zeile die ganze verfügbare Breite für sich.</p>
+     */
+    private Node plannedExamRow(CourseModule module, PlannedExam exam, boolean next,
+                                LocalDate today) {
+        boolean overdue = exam.isOverdue(today);
+        String when = Formats.dateWithWeekday(exam.getDate());
+        String line = next ? I18n.t("plannedExam.next", when) : when;
+        if (!overdue) {
+            line = line + " · " + Formats.examDue(exam.getDate(), today);
+        }
+
+        Label date = new Label(line);
+        date.getStyleClass().add(next ? "planned-exam__next" : "planned-exam__when");
+        // Kein Umbruch: die Zeilen stehen in einem VBox mit fester Zeilenhoehe,
+        // ein wachsendes Label wuerde die naechste Zeile ueberdecken. In einem
+        // sehr schmalen Fenster kuerzt JavaFX den Text; der volle Wortlaut
+        // steht dann im Hinweis weiter unten.
+        date.setMinWidth(0);
+
+        VBox text = new VBox(date);
+        text.setMinWidth(0);
+        HBox.setHgrow(text, Priority.ALWAYS);
+
+        HBox second = new HBox();
+        second.getStyleClass().add("planned-exam__line");
+        second.setAlignment(Pos.CENTER_LEFT);
+        second.setMinWidth(0);
+
+        // Ist der Termin vorbei und fehlt die Note noch, wird das benannt und
+        // nicht stillschweigend ausgeblendet. Das Wort steht neben der Farbe,
+        // und es wird nie gekürzt.
+        if (overdue) {
+            Label pending = new Label(I18n.t("plannedExam.pending"));
+            pending.getStyleClass().addAll("badge", "badge--warn");
+            pending.setMinWidth(Region.USE_PREF_SIZE);
+            second.getChildren().add(pending);
+        }
+
+        String detail = exam.hasLabel() ? exam.getLabel() : "";
+        if (exam.getWeight().compareTo(PlannedExam.DEFAULT_WEIGHT) != 0) {
+            detail = detail.isEmpty()
+                    ? Formats.weightFactor(exam.getWeight())
+                    : detail + " · " + Formats.weightFactor(exam.getWeight());
+        }
+        if (!detail.isEmpty()) {
+            Label label = new Label(detail);
+            label.getStyleClass().add("planned-exam__detail");
+            label.setMinWidth(0);
+            second.getChildren().add(label);
+        }
+        if (!second.getChildren().isEmpty()) {
+            text.getChildren().add(second);
+        }
+
+        Button enterGrade = new Button(I18n.t("plannedExam.enterGrade"));
+        enterGrade.getStyleClass().addAll("btn", "btn-tinted", "btn--compact");
+        enterGrade.setMinWidth(Region.USE_PREF_SIZE);
+        enterGrade.setOnAction(event -> enterGradeFor(module, exam));
+
+        Button edit = new Button();
+        edit.getStyleClass().add("btn-quiet-icon");
+        iconButton(edit, Icons.EDIT, I18n.t("plannedExam.edit"));
+        edit.setOnAction(event -> editPlannedExam(module, exam));
+
+        Button delete = new Button();
+        delete.getStyleClass().addAll("btn-quiet-icon", "btn-quiet-icon--danger");
+        iconButton(delete, Icons.DELETE, I18n.t("plannedExam.delete"));
+        delete.setOnAction(event -> deletePlannedExam(module, exam));
+
+        HBox actions = new HBox(enterGrade, edit, delete);
+        actions.getStyleClass().add("planned-exam__actions");
+        actions.setMinWidth(Region.USE_PREF_SIZE);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        HBox row = new HBox(text, actions);
+        row.getStyleClass().add("planned-exam");
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        String full = line
+                + (overdue ? " · " + I18n.t("plannedExam.pending") : "")
+                + (detail.isEmpty() ? "" : " · " + detail);
+        row.setAccessibleText(full);
+        Tooltip.install(row, new Tooltip(full));
+        return row;
+    }
+
+    /** Der zurückhaltende Link zum Eintragen einer weiteren Prüfung. */
+    private Node addExamRow(CourseModule module, boolean alone) {
+        Button add = new Button(I18n.t("plannedExam.add"));
+        add.getStyleClass().addAll("btn", "btn-plain", "btn--compact", "planned-exam__add");
+        add.setGraphic(Icons.create(Icons.PLUS, 13));
+        add.setOnAction(event -> createPlannedExam(module));
+
+        HBox row = new HBox(add);
+        row.getStyleClass().add(alone ? "planned-exam--empty" : "planned-exam");
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private void createPlannedExam(CourseModule module) {
+        PlannedExamDialog.forNewExam(window(), module.getName()).ifPresent(result -> {
+            service.addPlannedExam(module, result.label(), result.weight(), result.date());
+            refreshMeta();
+        });
+    }
+
+    private void editPlannedExam(CourseModule module, PlannedExam exam) {
+        PlannedExamDialog.forExistingExam(window(), module.getName(), exam).ifPresent(result -> {
+            service.updatePlannedExam(exam, result.label(), result.weight(), result.date());
+            refreshMeta();
+        });
+    }
+
+    private void deletePlannedExam(CourseModule module, PlannedExam exam) {
+        String consequence = I18n.t("dialog.delete.plannedExam.text",
+                Formats.date(exam.getDate()), module.getName());
+
+        if (Dialogs.confirmDelete(window(), I18n.t("dialog.delete.plannedExam.title"),
+                consequence, I18n.t("plannedExam.delete"))) {
+            service.removePlannedExam(module, exam);
+            refreshMeta();
+        }
+    }
+
+    /**
+     * Die Prüfung ist zurück: das Notenformular steht mit Bezeichnung,
+     * Gewichtung und Datum bereit. Wird die Note gespeichert, verschwindet die
+     * geplante Prüfung; bricht man ab, bleibt sie stehen.
+     */
+    private void enterGradeFor(CourseModule module, PlannedExam exam) {
+        GradeDialog.forPlannedExam(window(), module.getName(), exam).ifPresent(result -> {
+            service.convertToGrade(module, exam, result.label(), result.value(),
+                    result.weight(), result.date());
+            moduleList.refresh();
+            refreshMeta();
+        });
+    }
+
     // ----- Gemeinsames ------------------------------------------------------
 
     /** Hält die Kopfzeilen der drei Spalten mit dem aktuellen Stand im Takt. */
@@ -389,6 +567,7 @@ public final class SemestersController implements ViewController {
                 : I18n.t("semesters.inSemester", semester.getName()));
 
         CourseModule module = moduleList.getSelectionModel().getSelectedItem();
+        refreshPlannedExams(module);
         if (module == null) {
             gradesMetaLabel.setText(I18n.t("semesters.noModuleSelected"));
             moduleTrack.setGrade(null);
