@@ -10,8 +10,13 @@ public record GradeBookDto(
         int schemaVersion,
         List<SemesterDto> semesters) {
 
-    /** Aktuelle Version des Dateiformats. */
-    public static final int CURRENT_SCHEMA_VERSION = 1;
+    /**
+     * Aktuelle Version des Dateiformats.
+     *
+     * <p>Version 1: Semester, Module, Noten.<br>
+     * Version 2: geplante Prüfungen je Modul.</p>
+     */
+    public static final int CURRENT_SCHEMA_VERSION = 2;
 
     public GradeBookDto {
         semesters = semesters == null ? List.of() : List.copyOf(semesters);
