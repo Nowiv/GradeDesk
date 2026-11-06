@@ -2,58 +2,37 @@ package ch.gradedesk.ui.control;
 
 import ch.gradedesk.i18n.I18n;
 import ch.gradedesk.model.Grade;
+import ch.gradedesk.model.PlannedExam;
 import ch.gradedesk.service.GradeValidator;
-import ch.gradedesk.service.ValidationException;
 import ch.gradedesk.ui.util.Formats;
-import ch.gradedesk.ui.util.Theme;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Window;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Formular zum Erfassen und Bearbeiten einer Note.
  *
  * <p>Geprüft wird mit demselben {@link GradeValidator}, den auch das Modell
- * verwendet – es gibt keine zweite, abweichende Regel im UI. Eine ungültige
- * Eingabe schliesst den Dialog nicht, sondern markiert genau das betroffene
- * Feld und schreibt die Erklärung darunter.</p>
+ * verwendet – es gibt keine zweite, abweichende Regel im UI. Die Mechanik der
+ * Feldprüfung steht in {@link FormDialog}.</p>
  */
-public final class GradeDialog {
+public final class GradeDialog extends FormDialog<GradeDialog.Result> {
 
-    private final Dialog<Result> dialog = new Dialog<>();
     private final TextField labelField = new TextField();
     private final TextField valueField = new TextField();
     private final TextField weightField = new TextField();
     private final DatePicker datePicker = new DatePicker();
 
-    /** Fehlerzeile je Eingabefeld, damit die Meldung dort steht, wo sie hingehört. */
-    private final Map<Control, Label> errorLabels = new LinkedHashMap<>();
-
     private GradeDialog(Window owner, String title, String confirmLabel, String moduleName) {
-        dialog.initOwner(owner);
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.setTitle(I18n.t("app.name"));
-        dialog.setHeaderText(title);
+        super(owner, title);
 
         labelField.setPromptText(I18n.t("dialog.grade.label.prompt"));
         labelField.setPrefColumnCount(22);
@@ -77,52 +56,8 @@ public final class GradeDialog {
                 numbers,
                 field(I18n.t("field.gradeDate"), datePicker, null));
 
-        ButtonType confirm = new ButtonType(confirmLabel, ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancel = new ButtonType(I18n.t("action.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        DialogPane pane = dialog.getDialogPane();
-        Theme.apply(pane);
-        pane.setContent(form);
-        pane.setMinWidth(480);
-        pane.getButtonTypes().setAll(cancel, confirm);
-        Theme.primary((Button) pane.lookupButton(confirm));
-        Theme.secondary((Button) pane.lookupButton(cancel));
-
-        Button confirmButton = (Button) pane.lookupButton(confirm);
-        confirmButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (readInput() == null) {
-                event.consume();
-            }
-        });
-
-        dialog.setResultConverter(button -> button == confirm ? readInput() : null);
+        finish(form, confirmLabel, 480, this::readInput);
         Platform.runLater(labelField::requestFocus);
-    }
-
-    private VBox field(String labelText, Control control, String hint) {
-        Label label = new Label(labelText);
-        label.getStyleClass().add("field-label");
-        label.setLabelFor(control);
-
-        Label error = new Label();
-        error.getStyleClass().add("field-error");
-        error.setVisible(false);
-        error.setManaged(false);
-        error.setWrapText(true);
-        errorLabels.put(control, error);
-
-        VBox box = new VBox(label, control);
-        box.getStyleClass().add("dialog-form__field");
-        if (hint != null) {
-            Label hintLabel = new Label(hint);
-            hintLabel.getStyleClass().add("field-hint");
-            box.getChildren().add(hintLabel);
-        }
-        box.getChildren().add(error);
-
-        HBox.setHgrow(box, Priority.ALWAYS);
-        control.setMaxWidth(Double.MAX_VALUE);
-        return box;
     }
 
     /**
@@ -144,37 +79,10 @@ public final class GradeDialog {
         LocalDate date = check(datePicker, () -> GradeValidator.requireValidDate(datePicker.getValue()));
 
         if (label == null || value == null || weight == null || date == null) {
-            errorLabels.entrySet().stream()
-                    .filter(entry -> entry.getValue().isVisible())
-                    .findFirst()
-                    .ifPresent(entry -> entry.getKey().requestFocus());
+            focusFirstError();
             return null;
         }
         return new Result(label, value, weight, date);
-    }
-
-    /** Führt eine Prüfung aus und schreibt eine allfällige Meldung unter das Feld. */
-    private <T> T check(Control control, Supplier<T> validation) {
-        try {
-            return validation.get();
-        } catch (ValidationException e) {
-            Label error = errorLabels.get(control);
-            error.setText(I18n.t(e.getMessageKey(), e.getArguments()));
-            error.setVisible(true);
-            error.setManaged(true);
-            if (!control.getStyleClass().contains("text-field--invalid")) {
-                control.getStyleClass().add("text-field--invalid");
-            }
-            return null;
-        }
-    }
-
-    private void clearErrors() {
-        errorLabels.forEach((control, error) -> {
-            error.setVisible(false);
-            error.setManaged(false);
-            control.getStyleClass().remove("text-field--invalid");
-        });
     }
 
     /** Dialog zum Anlegen einer neuen Note. */
@@ -183,7 +91,7 @@ public final class GradeDialog {
                 I18n.t("dialog.grade.create.confirm"), moduleName);
         form.weightField.setText("1");
         form.datePicker.setValue(LocalDate.now());
-        return form.dialog.showAndWait();
+        return form.showAndWait();
     }
 
     /** Dialog zum Bearbeiten einer bestehenden Note. */
@@ -194,7 +102,24 @@ public final class GradeDialog {
         form.valueField.setText(Formats.gradeInput(grade.getValue()));
         form.weightField.setText(Formats.weight(grade.getWeight()));
         form.datePicker.setValue(grade.getDate());
-        return form.dialog.showAndWait();
+        return form.showAndWait();
+    }
+
+    /**
+     * Dialog für die Note zu einer geplanten Prüfung.
+     *
+     * <p>Bezeichnung, Gewichtung und Datum stehen bereits da; einzutragen bleibt
+     * der Notenwert. Der Fokus beginnt deshalb im Notenfeld.</p>
+     */
+    public static Optional<Result> forPlannedExam(Window owner, String moduleName,
+                                                  PlannedExam exam) {
+        GradeDialog form = new GradeDialog(owner, I18n.t("dialog.grade.fromPlanned.title"),
+                I18n.t("dialog.grade.create.confirm"), moduleName);
+        form.labelField.setText(exam.getLabel());
+        form.weightField.setText(Formats.weight(exam.getWeight()));
+        form.datePicker.setValue(exam.getDate());
+        Platform.runLater(form.valueField::requestFocus);
+        return form.showAndWait();
     }
 
     /** Die geprüften Eingaben des Formulars. */
@@ -202,7 +127,7 @@ public final class GradeDialog {
     }
 
     /** Zeigt und liest das Datum im Format der eingestellten Sprache. */
-    private static final class LocalDateConverter extends javafx.util.StringConverter<LocalDate> {
+    static final class LocalDateConverter extends javafx.util.StringConverter<LocalDate> {
 
         @Override
         public String toString(LocalDate date) {
