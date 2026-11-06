@@ -6,18 +6,22 @@ import java.util.Optional;
 /**
  * Hell oder dunkel – das Erscheinungsbild der Oberfläche.
  *
- * <p>Apple-Anwendungen gibt es in beiden Varianten, und die Farben dafür sind
- * nicht einfach invertiert: Apple definiert zwei vollständige Farbsätze. Genau
- * so ist es hier gelöst – {@code theme.css} enthält je einen Satz, und
- * umgeschaltet wird nur die Stilklasse an der Wurzel.</p>
+ * <p>Die Farben beider Varianten sind nicht einfach invertiert, sondern zwei
+ * vollständige Farbsätze: {@code theme.css} führt den hellen,
+ * {@code theme-dark.css} den dunklen. Umgeschaltet wird, welche Dateien an
+ * einer Szene hängen – siehe {@link Theme}.</p>
  *
  * <p>Eine automatische Übernahme vom Betriebssystem gibt es bewusst nicht:
  * JavaFX 21 kennt dafür keine Schnittstelle. Die Wahl ist deshalb ausdrücklich
  * und wird gemerkt.</p>
+ *
+ * <p>Die Stilklasse unten bezeichnet das Erscheinungsbild an der Wurzel der
+ * Szene. Sie trägt keine Farben: Popup-Fenster erben die Stylesheets ihrer
+ * Szene, aber nicht deren Stilklassen.</p>
  */
 public enum Appearance {
 
-    /** Heller Modus, wie ihn iOS standardmässig zeigt. */
+    /** Heller Modus. */
     LIGHT("appearance-light"),
 
     /** Dunkler Modus. */
