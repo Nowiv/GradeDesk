@@ -6,9 +6,11 @@ import ch.gradedesk.persistence.SettingsStore;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
@@ -65,6 +67,7 @@ public final class UpdateUi {
         ButtonType skip = new ButtonType(I18n.t("update.skip"), ButtonBar.ButtonData.NO);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         if (owner != null) alert.initOwner(owner);
+        theme(alert.getDialogPane());
         alert.setTitle(I18n.t("update.title"));
         alert.setHeaderText(I18n.t("update.available", update.latest()));
         String notes = update.releaseNotes() == null || update.releaseNotes().isBlank()
@@ -74,6 +77,9 @@ public final class UpdateUi {
         notesLabel.setMaxWidth(560);
         alert.getDialogPane().setContent(notesLabel);
         alert.getButtonTypes().setAll(install, later, skip);
+        Theme.primary((Button) alert.getDialogPane().lookupButton(install));
+        Theme.secondary((Button) alert.getDialogPane().lookupButton(later));
+        Theme.ghost((Button) alert.getDialogPane().lookupButton(skip));
         Optional<ButtonType> choice = alert.showAndWait();
         if (choice.isEmpty() || choice.get() == later) return;
         if (choice.get() == skip) {
@@ -86,6 +92,7 @@ public final class UpdateUi {
     private void download(Window owner, UpdateService.CheckResult update) {
         Dialog<Void> dialog = new Dialog<>();
         if (owner != null) dialog.initOwner(owner);
+        theme(dialog.getDialogPane());
         dialog.setTitle(I18n.t("update.downloading"));
         ProgressBar progress = new ProgressBar(ProgressBar.INDETERMINATE_PROGRESS);
         Label status = new Label(I18n.t("update.downloading"));
@@ -149,9 +156,27 @@ public final class UpdateUi {
     private static void info(Window owner, String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
         if (owner != null) alert.initOwner(owner);
+        theme(alert.getDialogPane());
         alert.setTitle(title);
         alert.setHeaderText(null);
+        Theme.primary((Button) alert.getDialogPane().lookupButton(ButtonType.OK));
         alert.showAndWait();
+    }
+
+    /**
+     * Haengt Stylesheets und Erscheinungsbild an einen Dialog.
+     *
+     * <p>Ein {@code Alert} oder {@code Dialog} uebernimmt das Stylesheet der
+     * Hauptszene nicht von selbst; ohne diesen Aufruf erscheinen die Dialoge
+     * des Aktualisierungsvorgangs im hellen Standarddesign von JavaFX.</p>
+     *
+     * <p>Das Standardsymbol des Alerts wird entfernt: es wird vom
+     * Standarddesign gezeichnet und folgt dem Erscheinungsbild nicht.</p>
+     */
+    private static void theme(DialogPane pane) {
+        Theme.apply(pane);
+        pane.setGraphic(null);
+        pane.setMinWidth(440);
     }
 
     private static String safeMessage(Throwable throwable) {
