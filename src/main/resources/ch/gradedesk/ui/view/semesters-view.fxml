@@ -74,6 +74,8 @@
                     </VBox>
                 </HBox>
                 <HBox fx:id="moduleGradeBox" styleClass="module-summary"/>
+                <!-- Geplante Pruefungen: steht dort, wo die Noten erfasst werden. -->
+                <VBox fx:id="plannedExamBox" styleClass="planned-exams"/>
                 <VBox styleClass="card__body" VBox.vgrow="ALWAYS">
                     <TableView fx:id="gradesTable" VBox.vgrow="ALWAYS">
                         <columns>
