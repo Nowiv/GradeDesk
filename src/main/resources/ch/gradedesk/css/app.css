@@ -32,6 +32,92 @@
 }
 
 /* ----------------------------------------------------------------------
+ * Grundfarbe fuer Text. Sicherheitsnetz: ein Label ohne eigene Stilklasse
+ * bekaeme sonst die Textfarbe des JavaFX-Standarddesigns (dunkelgrau) und
+ * waere im dunklen Erscheinungsbild nicht lesbar. Alle spaeteren
+ * .label-*-Regeln ueberschreiben diese hier.
+ * -------------------------------------------------------------------- */
+
+.label {
+    -fx-text-fill: -ui-text;
+}
+
+/* ----------------------------------------------------------------------
+ * Menueleiste und ihr Flyout. Ohne eigene Regeln zeichnet JavaFX hier
+ * seine helle Standardleiste – quer ueber den Kopf eines dunklen Fensters.
+ * -------------------------------------------------------------------- */
+
+.menu-bar {
+    -fx-background-color: -ui-bg-sidebar;
+    -fx-background-insets: 0;
+    -fx-padding: 2px 6px;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-padding: 4px 10px;
+    -fx-cursor: default;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 14px;
+}
+
+.menu-bar > .container > .menu-button:disabled > .label {
+    -fx-text-fill: -ui-text-quaternary;
+}
+
+/* Flyout von Menue und Kontextmenue: wie das Kalender-Popup. */
+.context-menu {
+    -fx-background-color: -ui-bg-overlay;
+    -fx-background-radius: 8px;
+    -fx-border-color: -ui-border-strong;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+    -fx-effect: dropshadow(gaussian, -ui-shadow-flyout, 24, 0, 0, 8);
+}
+
+.context-menu .separator:horizontal .line {
+    -fx-border-color: -ui-separator transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-insets: 4px 8px 4px 8px;
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-padding: 6px 12px;
+}
+
+.menu-item .label {
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 14px;
+}
+
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: -ui-bg-hover;
+}
+
+.menu-item:focused .label,
+.menu-item:hover .label {
+    -fx-text-fill: -ui-text;
+}
+
+.menu-item:disabled .label {
+    -fx-text-fill: -ui-text-quaternary;
+}
+
+/* ----------------------------------------------------------------------
  * Navigationsbereich: Mica-Flaeche ohne Trennlinie. Die Trennung entsteht
  * durch die Kante des Inhalts-Layers (siehe .content).
  * -------------------------------------------------------------------- */
@@ -440,12 +526,12 @@
 .btn-filled {
     -fx-background-color: -ui-accent;
     -fx-text-fill: -ui-text-on-accent;
-    -fx-border-color: -ui-accent -ui-accent derive(-ui-accent, -28%) -ui-accent;
+    -fx-border-color: -ui-accent -ui-accent -ui-accent-stroke-bottom -ui-accent;
 }
 
 .btn-filled:hover {
     -fx-background-color: -ui-accent-bright;
-    -fx-border-color: -ui-accent-bright -ui-accent-bright derive(-ui-accent, -28%) -ui-accent-bright;
+    -fx-border-color: -ui-accent-bright -ui-accent-bright -ui-accent-stroke-bottom -ui-accent-bright;
 }
 
 .btn-filled:pressed {
@@ -656,7 +742,7 @@
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 4px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 24, 0, 0, 8);
+    -fx-effect: dropshadow(gaussian, -ui-shadow-flyout, 24, 0, 0, 8);
 }
 
 .date-picker-popup > * > .month-year-pane {
@@ -723,6 +809,81 @@
     -fx-text-fill: -ui-text-quaternary;
 }
 
+
+/* ----------------------------------------------------------------------
+ * Kontrollkaestchen – Windows-CheckBox: 4 px Radius, bei Auswahl in der
+ * Akzentfarbe gefuellt. Die Beschriftung steht rechts daneben.
+ * -------------------------------------------------------------------- */
+
+.check-box {
+    -fx-text-fill: -ui-text;
+    -fx-font-size: 14px;
+    -fx-label-padding: 0 0 0 8px;
+    -fx-cursor: default;
+}
+
+.check-box > .box {
+    -fx-background-color: -ui-bg-input;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-border-color: -ui-stroke-input-bottom;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+}
+
+.check-box:hover > .box {
+    -fx-background-color: -ui-control-hover;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+}
+
+.check-box:selected > .box {
+    -fx-background-color: -ui-accent;
+    -fx-border-color: -ui-accent;
+}
+
+.check-box:selected:hover > .box {
+    -fx-background-color: -ui-accent-bright;
+    -fx-border-color: -ui-accent-bright;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -ui-text-on-accent;
+}
+
+.check-box:disabled {
+    -fx-opacity: 0.45;
+}
+
+.check-box:focus-visible > .box {
+    -fx-border-color: -ui-focus;
+    -fx-border-width: 2px;
+}
+
+/* ----------------------------------------------------------------------
+ * Fortschrittsbalken – nur im Aktualisierungsdialog sichtbar.
+ * -------------------------------------------------------------------- */
+
+.progress-bar {
+    -fx-indeterminate-bar-length: 80;
+    -fx-indeterminate-bar-escape: true;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -ui-track;
+    -fx-background-insets: 0;
+    -fx-background-radius: 999px;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -ui-accent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 999px;
+    -fx-padding: 3px;
+}
+
 .field-label {
     -fx-font-size: 14px;
     -fx-text-fill: -ui-text;
@@ -773,7 +934,7 @@
     -fx-border-color: -ui-bg-surface;
     -fx-border-radius: 999px;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.22), 4, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, -ui-shadow-marker, 4, 0, 0, 1);
 }
 
 .grade-fill--insufficient { -fx-background-color: -ui-fail; }
@@ -1286,7 +1447,7 @@
     -fx-text-fill: -ui-text;
     -fx-font-size: 12px;
     -fx-padding: 6px 8px 7px 8px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.16), 12, 0, 0, 4);
+    -fx-effect: dropshadow(gaussian, -ui-shadow-tooltip, 12, 0, 0, 4);
 }
 
 .icon {

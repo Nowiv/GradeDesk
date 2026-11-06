@@ -1,74 +1,106 @@
 /*
- * GradeDesk – Farbpalette DUNKEL (Windows-11-Explorer-Stil).
+ * GradeDesk – zentrale Farbpalette, HELL.
  *
- * Exakt dieselben Variablen wie theme.css. Zum Umschalten statt theme.css
- * diese Datei laden (siehe Hinweis in der Antwort).
+ * Diese Datei und theme-dark.css sind die einzigen Orte im Projekt, an denen
+ * ein Farbwert steht. app.css, FXML und Java arbeiten ausschliesslich mit den
+ * hier definierten Variablen.
  *
- * Im Dunkeln wird die Notenskala umgekehrt: hoehere Noten sind HELLER,
- * damit "besser" auf dunklem Grund weiterhin "staerker" liest.
+ * Umschalten: Theme laedt immer theme.css und haengt im dunklen
+ * Erscheinungsbild zusaetzlich theme-dark.css an, das dieselben Variablen mit
+ * dunklen Werten ueberschreibt. Beide Dateien definieren die Variablen auf
+ * ".root".
+ *
+ * Warum zwei Dateien und keine Stilklasse an der Wurzel: JavaFX gibt einem
+ * Popup-Fenster (Tooltip, ContextMenu, Kalender des DatePicker) die
+ * Stylesheets der Szene mit, aber nicht die Stilklassen ihrer Wurzel. Die
+ * Wurzel eines Popups traegt nur "root" und "popup". Eine Palette unter
+ * ".appearance-dark" wuerde in jedem Popup wieder auf die helle Variante
+ * zurueckfallen. Unter ".root" findet sie auch das Popup.
+ *
+ * Die Stilklasse appearance-light/appearance-dark wird weiterhin an die
+ * Wurzel gesetzt, aber nur fuer Regeln ohne Farbe. Keine Farbvariable darf
+ * von ihr abhaengen.
+ *
+ * Der Selektor ".tooltip" steht neben ".root", weil ein Tooltip die
+ * Variablen seiner Szene nicht aufloest: ohne eigene Definition faellt er auf
+ * das graue Standard-Tooltip von JavaFX zurueck. Die Palette steht dort
+ * deshalb ein zweites Mal zur Verfuegung, ohne einen Wert zu wiederholen.
+ *
+ * Die Kontrastwerte beider Paletten sind in ThemeContrastTest festgehalten.
  */
 
-.root {
+.root,
+.tooltip {
     -fx-font-family: "Segoe UI";
     -fx-font-size: 14px;
 
     /* Flaechen */
-    -ui-bg-sidebar:          #202020;
-    -ui-bg-base:             #272727;
-    -ui-bg-surface:          #2e2e2e;
-    -ui-bg-raised:           #373737;
-    -ui-bg-input:            #333333;
-    -ui-bg-input-focus:      #1f1f1f;
-    -ui-bg-overlay:          #2c2c2c;
-    -ui-bg-hover:            rgba(255, 255, 255, 0.055);
-    -ui-bg-active:           rgba(255, 255, 255, 0.085);
-    -ui-control-hover:       #3c3c3c;
-    -ui-control-pressed:     #323232;
-    -ui-nav-hover:           #2b2b2b;
-    -ui-nav-active:          #323232;
+    -ui-bg-sidebar:          #f3f3f3;
+    -ui-bg-base:             #fbfbfb;
+    -ui-bg-surface:          #ffffff;
+    -ui-bg-raised:           #fdfdfd;
+    -ui-bg-input:            #fdfdfd;
+    -ui-bg-input-focus:      #ffffff;
+    -ui-bg-overlay:          #fbfbfb;
+    -ui-bg-hover:            rgba(0, 0, 0, 0.037);
+    -ui-bg-active:           rgba(0, 0, 0, 0.07);
+    -ui-control-hover:       #f6f6f6;
+    -ui-control-pressed:     #f2f2f2;
+    -ui-nav-hover:           #eaeaea;
+    -ui-nav-active:          #e2e2e2;
 
     /* Explorer-Auswahl */
-    -ui-row-hover:           #363636;
-    -ui-selection:           #434343;
-    -ui-selection-stroke:    #5c5c5c;
+    -ui-row-hover:           #f0f0f0;
+    -ui-selection:           #e8f1fb;
+    -ui-selection-stroke:    #005fb8;
 
     /* Kanten */
-    -ui-border:              #1d1d1d;
-    -ui-border-strong:       #161616;
-    -ui-separator:           #3a3a3a;
-    -ui-layer-stroke:        #1a1a1a;
-    -ui-stroke-control:      #454545;
-    -ui-stroke-control-bottom: #3d3d3d;
-    -ui-stroke-input-bottom: #9a9a9a;
-    -ui-scroll-thumb:        #9f9f9f;
-    -ui-track:               #3d3d3d;
-    -ui-focus:               #ffffff;
+    -ui-border:              #e5e5e5;
+    -ui-border-strong:       #d0d0d0;
+    -ui-separator:           #e5e5e5;
+    -ui-layer-stroke:        #e0e0e0;
+    -ui-stroke-control:      #e0e0e0;
+    -ui-stroke-control-bottom: #cfcfcf;
+    -ui-stroke-input-bottom: #868686;
+    -ui-scroll-thumb:        #868686;
+    -ui-track:               #ebebeb;
+    -ui-focus:               #1a1a1a;
+
+    /* Schatten – dieselbe Rolle in beiden Paletten, im Dunkeln kraeftiger. */
+    -ui-shadow-flyout:       rgba(0, 0, 0, 0.13);
+    -ui-shadow-tooltip:      rgba(0, 0, 0, 0.11);
+    -ui-shadow-marker:       rgba(0, 0, 0, 0.16);
 
     /* Text */
-    -ui-text:                #ffffff;
-    -ui-text-secondary:      #cfcfcf;
-    -ui-text-tertiary:       #a6a6a6;
-    -ui-text-quaternary:     #6e6e6e;
-    -ui-text-on-accent:      #000000;
+    -ui-text:                #1b1b1b;
+    -ui-text-secondary:      #5a5a5a;
+    -ui-text-tertiary:       #6b6b6b;
+    -ui-text-quaternary:     #727272;
+    -ui-text-on-accent:      #ffffff;
 
     /* Akzent */
-    -ui-accent:              #60cdff;
-    -ui-accent-bright:       #58bae7;
-    -ui-accent-pressed:      #4fa8d3;
-    -ui-accent-wash:         #2e5875;
+    -ui-accent:              #005fb8;
+    -ui-accent-bright:       #1a6cbf;
+    -ui-accent-pressed:      #004c92;
+    -ui-accent-stroke-bottom: #003f7a;
+    -ui-accent-wash:         #cfe4f7;
 
     /* Signalfarben */
-    -ui-pass:                #6ccb5f;
-    -ui-pass-wash:           #393d1b;
-    -ui-fail:                #ff99a4;
-    -ui-fail-wash:           #442726;
-    -ui-warn:                #fce100;
-    -ui-warn-wash:           #433519;
+    -ui-pass:                #0f7b0f;
+    -ui-pass-wash:           #dff6dd;
+    -ui-fail:                #b32b1c;
+    -ui-fail-wash:           #fde7e9;
+    -ui-warn:                #8a5300;
+    -ui-warn-wash:           #fff4ce;
 
-    /* Notenskala 4.0 -> 6.0, dunkel nach hell */
-    -ui-pass-light:          #2f5e2b;
-    -ui-pass-mid:            #3f7f38;
-    -ui-pass-base:           #54a24a;
-    -ui-pass-strong:         #6ccb5f;
-    -ui-pass-deep:           #9be08f;
+    /*
+     * Notenskala 4.0 -> 6.0. Auf hellem Grund wird die bessere Note DUNKLER,
+     * damit "besser" als "kraeftiger" liest; in Graustufen bleibt die
+     * Reihenfolge dadurch erkennbar.
+     */
+    -ui-pass-light:          #4a9443;
+    -ui-pass-mid:            #3d8237;
+    -ui-pass-base:           #2e6a29;
+    -ui-pass-strong:         #20531d;
+    -ui-pass-deep:           #153e12;
 }
