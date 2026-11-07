@@ -5,6 +5,7 @@ import ch.gradedesk.model.CourseModule;
 import ch.gradedesk.model.Semester;
 import ch.gradedesk.service.GradeBookService;
 import ch.gradedesk.service.GradeValidator;
+import ch.gradedesk.service.ValidationException;
 import ch.gradedesk.ui.AppServices;
 import javafx.geometry.Insets;
 import ch.gradedesk.ui.ViewController;
@@ -157,11 +158,23 @@ public final class OverviewController implements ViewController {
                 + " · " + I18n.t("count.modulesWithGrade", (int) semester.countGradedModules()));
         meta.getStyleClass().add("card__meta");
 
-        VBox titleBox = new VBox(name, meta);
+        // Der Stempel steht neben dem Namen und sagt es in einem Wort; die
+        // Tönung allein wäre für Rot-Grün-Sehschwäche keine Auskunft.
+        HBox nameRow = new HBox(name);
+        nameRow.setAlignment(Pos.CENTER_LEFT);
+        nameRow.setSpacing(10);
+        if (semester.isCompleted()) {
+            Label stamp = new Label(I18n.t("status.completed"));
+            stamp.getStyleClass().addAll("badge", "badge--stamp");
+            nameRow.getChildren().add(stamp);
+        }
+
+        VBox titleBox = new VBox(nameRow, meta);
         HBox.setHgrow(titleBox, Priority.ALWAYS);
 
         Button addModule = Theme.secondary(new Button(I18n.t("overview.addModule")));
         addModule.setGraphic(Icons.create(Icons.PLUS, 14));
+        addModule.setDisable(semester.isCompleted());
         addModule.setOnAction(event -> createModule(semester));
 
         HBox header = new HBox(titleBox, createSemesterAverage(semester), addModule);
@@ -198,6 +211,7 @@ public final class OverviewController implements ViewController {
 
         Button action = Theme.secondary(new Button(I18n.t("overview.noModules.action")));
         action.setGraphic(Icons.create(Icons.PLUS, 14));
+        action.setDisable(semester.isCompleted());
         action.setOnAction(event -> createModule(semester));
 
         VBox empty = new VBox(text, action);
@@ -289,6 +303,16 @@ public final class OverviewController implements ViewController {
                         I18n.t("field.moduleName"), "",
                         I18n.t("action.create"),
                         GradeValidator::requireValidText)
-                .ifPresent(name -> service.addModule(semester, name));
+                .ifPresent(name -> {
+                    try {
+                        service.addModule(semester, name);
+                    } catch (ValidationException e) {
+                        // Die Schaltfläche ist bei einem abgeschlossenen Semester
+                        // ausgegraut; kommt die Änderung trotzdem hier an, soll
+                        // der Grund im Klartext erscheinen.
+                        Dialogs.error(window(), I18n.t("dialog.locked.title"),
+                                I18n.t(e.getMessageKey(), e.getArguments()));
+                    }
+                });
     }
 }

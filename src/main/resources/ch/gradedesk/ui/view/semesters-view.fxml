@@ -35,6 +35,7 @@
                         <Label styleClass="card__title" text="%semesters.semesters"/>
                         <Label fx:id="semesterMetaLabel" styleClass="card__meta"/>
                     </VBox>
+                    <Button fx:id="completeSemesterButton" styleClass="btn-quiet-icon"/>
                     <Button fx:id="renameSemesterButton" styleClass="btn-quiet-icon"/>
                     <Button fx:id="deleteSemesterButton"
                             styleClass="btn-quiet-icon,btn-quiet-icon--danger"/>

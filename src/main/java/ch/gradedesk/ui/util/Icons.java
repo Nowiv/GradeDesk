@@ -84,6 +84,11 @@ public final class Icons {
             "M7.6 10.3V7.7a4.4 4.4 0 0 1 8.8 0v2.6"
             + "M6.9 10.3h10.2a1.6 1.6 0 0 1 1.6 1.6v6.1a1.6 1.6 0 0 1-1.6 1.6H6.9a1.6 1.6 0 0 1-1.6-1.6v-6.1a1.6 1.6 0 0 1 1.6-1.6z";
 
+    /** Offenes Schloss: ein abgeschlossenes Semester wieder oeffnen. */
+    public static final String UNLOCK =
+            "M7.6 10.3V7.7a4.4 4.4 0 0 1 8.8 0"
+            + "M6.9 10.3h10.2a1.6 1.6 0 0 1 1.6 1.6v6.1a1.6 1.6 0 0 1-1.6 1.6H6.9a1.6 1.6 0 0 1-1.6-1.6v-6.1a1.6 1.6 0 0 1 1.6-1.6z";
+
     private Icons() {
     }
 

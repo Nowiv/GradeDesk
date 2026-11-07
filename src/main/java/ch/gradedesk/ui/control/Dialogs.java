@@ -41,18 +41,39 @@ public final class Dialogs {
      */
     public static boolean confirmDelete(Window owner, String title, String consequence,
                                         String confirmLabel) {
+        return confirm(owner, title, consequence, confirmLabel, true);
+    }
+
+    /**
+     * Bestätigung für eine Aktion, die nichts löscht, aber bewusst geschehen
+     * soll – etwa das Wiederöffnen eines abgeschlossenen Semesters.
+     *
+     * @param explanation was die Aktion bedeutet, in einem Satz
+     */
+    public static boolean confirm(Window owner, String title, String explanation,
+                                  String confirmLabel) {
+        return confirm(owner, title, explanation, confirmLabel, false);
+    }
+
+    private static boolean confirm(Window owner, String title, String explanation,
+                                   String confirmLabel, boolean destructive) {
         Dialog<ButtonType> dialog = baseDialog(owner, title);
         ButtonType confirm = new ButtonType(confirmLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancel = new ButtonType(I18n.t("action.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         DialogPane pane = dialog.getDialogPane();
-        pane.setContentText(consequence);
+        pane.setContentText(explanation);
         pane.getButtonTypes().setAll(cancel, confirm);
 
-        Button confirmButton = Theme.danger((Button) pane.lookupButton(confirm));
+        Button confirmButton = (Button) pane.lookupButton(confirm);
+        if (destructive) {
+            Theme.danger(confirmButton);
+        } else {
+            Theme.primary(confirmButton);
+        }
         Button cancelButton = Theme.secondary((Button) pane.lookupButton(cancel));
 
-        // Abbrechen ist die Standardaktion: ein versehentliches Enter löscht nichts.
+        // Abbrechen ist die Standardaktion: ein versehentliches Enter bestätigt nichts.
         confirmButton.setDefaultButton(false);
         cancelButton.setDefaultButton(true);
 
