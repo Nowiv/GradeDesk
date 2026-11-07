@@ -38,7 +38,8 @@ public final class GradeBookMapper {
         List<ModuleDto> modules = semester.getModules().stream()
                 .map(GradeBookMapper::toDto)
                 .toList();
-        return new SemesterDto(semester.getId(), semester.getName(), modules);
+        return new SemesterDto(semester.getId(), semester.getName(),
+                semester.isCompleted(), modules);
     }
 
     private static ModuleDto toDto(CourseModule module) {
@@ -71,6 +72,7 @@ public final class GradeBookMapper {
 
     private static Semester toModel(SemesterDto dto) {
         Semester semester = new Semester(idOrNew(dto.id()), nameOrPlaceholder(dto.name(), "Semester"));
+        semester.setCompleted(dto.completed());
         dto.modules().stream()
                 .filter(module -> module != null)
                 .map(GradeBookMapper::toModel)
