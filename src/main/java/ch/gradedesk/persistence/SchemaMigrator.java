@@ -44,6 +44,11 @@ public final class SchemaMigrator {
             version = 2;
         }
 
+        if (version < 3) {
+            semesters = openEverySemester(semesters);
+            version = 3;
+        }
+
         return new GradeBookDto(GradeBookDto.CURRENT_SCHEMA_VERSION, semesters);
     }
 
@@ -59,11 +64,27 @@ public final class SchemaMigrator {
         return semesters.stream()
                 .filter(semester -> semester != null)
                 .map(semester -> new SemesterDto(semester.id(), semester.name(),
+                        semester.completed(),
                         semester.modules().stream()
                                 .filter(module -> module != null)
                                 .map(module -> new ModuleDto(module.id(), module.name(),
                                         module.grades(), List.of()))
                                 .toList()))
+                .toList();
+    }
+
+    /**
+     * Version 2 → 3: der Stempel «abgeschlossen» kommt dazu.
+     *
+     * <p>Eine ältere Datei kennt ihn nicht, also ist jedes Semester offen. Das
+     * ist die sichere Richtung: ein fälschlich offenes Semester kostet einen
+     * Klick, ein fälschlich gesperrtes sperrt jemanden aus seinen Daten aus.</p>
+     */
+    private static List<SemesterDto> openEverySemester(List<SemesterDto> semesters) {
+        return semesters.stream()
+                .filter(semester -> semester != null)
+                .map(semester -> new SemesterDto(semester.id(), semester.name(), false,
+                        semester.modules()))
                 .toList();
     }
 }

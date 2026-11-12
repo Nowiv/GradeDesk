@@ -74,7 +74,9 @@ public final class GradeDeskApp extends Application {
 
         stage.setScene(scene);
         stage.setTitle(I18n.t("app.name"));
-        stage.setMinWidth(1060);
+        // Die Semesterspalte trägt seit dem Stempel drei Aktionen; darunter
+        // bliebe von ihrem Titel nichts mehr übrig.
+        stage.setMinWidth(1100);
         stage.setMinHeight(660);
         stage.setMaximized(true);
         stage.getIcons().add(new Image(icon()));

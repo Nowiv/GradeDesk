@@ -14,9 +14,10 @@ public record GradeBookDto(
      * Aktuelle Version des Dateiformats.
      *
      * <p>Version 1: Semester, Module, Noten.<br>
-     * Version 2: geplante Prüfungen je Modul.</p>
+     * Version 2: geplante Prüfungen je Modul.<br>
+     * Version 3: abgeschlossene Semester.</p>
      */
-    public static final int CURRENT_SCHEMA_VERSION = 2;
+    public static final int CURRENT_SCHEMA_VERSION = 3;
 
     public GradeBookDto {
         semesters = semesters == null ? List.of() : List.copyOf(semesters);

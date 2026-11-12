@@ -45,6 +45,7 @@ class JsonGradeRepositoryTest {
                 new BigDecimal("3.5"), BigDecimal.ONE, LocalDate.of(2025, 11, 3)));
         math.getPlannedExams().add(new PlannedExam("exam-1", "Prüfung 3",
                 new BigDecimal("2"), LocalDate.of(2026, 1, 20)));
+        semester.setCompleted(true);
         CourseModule empty = new CourseModule("mod-2", "Sport");
         empty.getPlannedExams().add(new PlannedExam("exam-2", "",
                 BigDecimal.ONE, LocalDate.of(2026, 2, 3)));
@@ -228,6 +229,39 @@ class JsonGradeRepositoryTest {
         CourseModule module = result.semesters().get(0).getModules().get(0);
         assertEquals(1, module.getGrades().size());
         assertEquals("Mit Wert", module.getGrades().get(0).getLabel());
+    }
+
+    @Test
+    @DisplayName("Der Stempel «abgeschlossen» wird mitgespeichert und wieder geladen")
+    void savesAndLoadsTheCompletedStamp() {
+        repository.save(sampleData());
+
+        LoadResult result = repository.load();
+
+        assertTrue(result.semesters().get(0).isCompleted());
+    }
+
+    @Test
+    @DisplayName("Eine Datei der Version 2 kommt mit offenen Semestern an")
+    void semestersOfOlderFilesAreOpen() throws IOException {
+        Files.writeString(dataDir.resolve(JsonGradeRepository.DATA_FILE_NAME), """
+                {
+                  "schemaVersion": 2,
+                  "semesters": [
+                    { "id": "s1", "name": "HS 2025", "modules": [
+                      { "id": "m1", "name": "Mathematik", "grades": [
+                        { "id": "g1", "label": "Prüfung 1", "value": 5.0, "weight": 1, "date": "2025-09-01" }
+                      ]}
+                    ]}
+                  ]
+                }
+                """, StandardCharsets.UTF_8);
+
+        LoadResult result = repository.load();
+
+        assertEquals(LoadResult.Status.LOADED, result.status());
+        assertFalse(result.semesters().get(0).isCompleted());
+        assertEquals(1, result.semesters().get(0).getModules().get(0).getGrades().size());
     }
 
     @Test

@@ -3,8 +3,10 @@ package ch.gradedesk.model;
 import ch.gradedesk.service.GradeCalculator;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -21,6 +23,12 @@ import java.util.UUID;
  *
  * <p>Der Semesterdurchschnitt bildet sich aus den <em>gerundeten</em> Modulnoten.
  * Module ohne Noten werden dabei übersprungen.</p>
+ *
+ * <p>Ein Semester kann als <em>abgeschlossen</em> gestempelt werden. Das ist
+ * eine Aussage über den Stand, keine über die Rechnung: ein abgeschlossenes
+ * Semester zählt in jedem Durchschnitt und im Diagramm unverändert mit. Was es
+ * bedeutet, ist allein, dass daran nichts mehr geändert wird – durchgesetzt
+ * wird das im {@code GradeBookService}, nicht hier.</p>
  */
 public final class Semester {
 
@@ -30,6 +38,7 @@ public final class Semester {
             FXCollections.observableArrayList(CourseModule::observables);
 
     private final ObjectProperty<BigDecimal> average = new SimpleObjectProperty<>(this, "average");
+    private final BooleanProperty completed = new SimpleBooleanProperty(this, "completed", false);
 
     public Semester(String name) {
         this(UUID.randomUUID().toString(), name);
@@ -65,6 +74,25 @@ public final class Semester {
         this.name.set(name == null ? "" : name);
     }
 
+    /**
+     * Ob das Semester abgeschlossen und damit gesperrt ist.
+     *
+     * <p>Das UI bindet sich daran, um seine Schaltflächen auszugrauen. Die
+     * Sperre selbst liegt im Service: ausgegraute Schaltflächen sind ein
+     * Hinweis, keine Zusicherung.</p>
+     */
+    public BooleanProperty completedProperty() {
+        return completed;
+    }
+
+    public boolean isCompleted() {
+        return completed.get();
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed.set(completed);
+    }
+
     /** Die Module dieses Semesters in der vom Benutzer gewählten Reihenfolge. */
     public ObservableList<CourseModule> getModules() {
         return modules;
@@ -86,7 +114,9 @@ public final class Semester {
 
     /** Die Properties, auf die eine beobachtbare Liste von Semestern reagieren soll. */
     public static Observable[] observables(Semester semester) {
-        return new Observable[] { semester.nameProperty(), semester.getModules() };
+        return new Observable[] {
+                semester.nameProperty(), semester.completedProperty(), semester.getModules()
+        };
     }
 
     @Override

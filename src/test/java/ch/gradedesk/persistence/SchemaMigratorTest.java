@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,12 +23,17 @@ class SchemaMigratorTest {
     private static final LocalDate DATE = LocalDate.of(2025, 9, 12);
 
     private static GradeBookDto fileOfVersion(int version, List<PlannedExamDto> plannedExams) {
+        return fileOfVersion(version, plannedExams, false);
+    }
+
+    private static GradeBookDto fileOfVersion(int version, List<PlannedExamDto> plannedExams,
+                                              boolean completed) {
         ModuleDto module = new ModuleDto("m1", "Mathematik",
                 List.of(new GradeDto("g1", "Prüfung 1", new BigDecimal("4.5"),
                         BigDecimal.ONE, DATE)),
                 plannedExams);
         return new GradeBookDto(version,
-                List.of(new SemesterDto("s1", "HS 2025", List.of(module))));
+                List.of(new SemesterDto("s1", "HS 2025", completed, List.of(module))));
     }
 
     private static ModuleDto firstModule(GradeBookDto dto) {
@@ -76,6 +82,44 @@ class SchemaMigratorTest {
         assertEquals(1, firstModule(migrated).plannedExams().size());
         assertEquals("Test 2", firstModule(migrated).plannedExams().get(0).label());
         assertEquals(DATE.plusDays(30), firstModule(migrated).plannedExams().get(0).date());
+    }
+
+    @Test
+    @DisplayName("Version 1: jedes Semester kommt offen an")
+    void version1GetsOpenSemesters() {
+        GradeBookDto migrated = SchemaMigrator.migrate(fileOfVersion(1, null, true));
+
+        // Der Stempel existiert in Version 1 nicht; ein gesetzter Wert in einer
+        // solchen Datei ist nicht vertrauenswuerdig und wird nicht uebernommen.
+        assertFalse(migrated.semesters().get(0).completed());
+    }
+
+    @Test
+    @DisplayName("Version 2: jedes Semester kommt offen an")
+    void version2GetsOpenSemesters() {
+        GradeBookDto migrated = SchemaMigrator.migrate(fileOfVersion(2, null, true));
+
+        assertFalse(migrated.semesters().get(0).completed());
+        assertEquals(GradeBookDto.CURRENT_SCHEMA_VERSION, migrated.schemaVersion());
+    }
+
+    @Test
+    @DisplayName("Version 3: der Stempel bleibt erhalten")
+    void version3KeepsTheStamp() {
+        GradeBookDto migrated = SchemaMigrator.migrate(fileOfVersion(3, null, true));
+
+        assertTrue(migrated.semesters().get(0).completed());
+    }
+
+    @Test
+    @DisplayName("Version 1 wandert über alle Schritte bis zur aktuellen Version")
+    void version1PassesEveryStep() {
+        GradeBookDto migrated = SchemaMigrator.migrate(fileOfVersion(1, null, true));
+
+        assertEquals(GradeBookDto.CURRENT_SCHEMA_VERSION, migrated.schemaVersion());
+        assertTrue(firstModule(migrated).plannedExams().isEmpty());
+        assertFalse(migrated.semesters().get(0).completed());
+        assertEquals(1, firstModule(migrated).grades().size());
     }
 
     @Test

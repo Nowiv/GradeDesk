@@ -7,6 +7,7 @@ import ch.gradedesk.model.PlannedExam;
 import ch.gradedesk.model.Semester;
 import ch.gradedesk.service.GradeBookService;
 import ch.gradedesk.service.GradeValidator;
+import ch.gradedesk.service.ValidationException;
 import ch.gradedesk.ui.AppServices;
 import ch.gradedesk.ui.ViewController;
 import ch.gradedesk.ui.control.Dialogs;
@@ -16,6 +17,7 @@ import ch.gradedesk.ui.control.PlannedExamDialog;
 import ch.gradedesk.ui.util.Formats;
 import ch.gradedesk.ui.util.Icons;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -84,6 +86,8 @@ public final class SemestersController implements ViewController {
     @FXML
     private Button addSemesterButton;
     @FXML
+    private Button completeSemesterButton;
+    @FXML
     private Button renameSemesterButton;
     @FXML
     private Button deleteSemesterButton;
@@ -142,26 +146,27 @@ public final class SemestersController implements ViewController {
                 semester -> Formats.moduleCount(semester.getModules().size())
                         + (semester.getAverage() == null
                         ? ""
-                        : " · " + Formats.averageLabel(semester.getAverage()))));
+                        : " · " + Formats.averageLabel(semester.getAverage())),
+                semester -> semester.isCompleted() ? I18n.t("status.completed") : null));
         semesterList.getSelectionModel().selectedItemProperty().addListener(
                 (observable, previous, selected) -> onSemesterSelected(selected));
 
         iconButton(renameSemesterButton, Icons.EDIT, I18n.t("semesters.renameSemester"));
         iconButton(deleteSemesterButton, Icons.DELETE, I18n.t("semesters.deleteSemester"));
+        iconButton(completeSemesterButton, Icons.LOCK, I18n.t("semesters.completeSemester"));
 
         addSemesterButton.setGraphic(Icons.create(Icons.PLUS, 14));
         addSemesterButton.setOnAction(event -> createSemester());
         renameSemesterButton.setOnAction(event -> renameSemester());
         deleteSemesterButton.setOnAction(event -> deleteSemester());
+        completeSemesterButton.setOnAction(event -> toggleCompleted());
 
         semesterList.setPlaceholder(placeholder(I18n.t("semesters.placeholder.noSemester")));
     }
 
     private void onSemesterSelected(Semester semester) {
         boolean present = semester != null;
-        renameSemesterButton.setDisable(!present);
-        deleteSemesterButton.setDisable(!present);
-        addModuleButton.setDisable(!present);
+        completeSemesterButton.setDisable(!present);
 
         moduleList.setItems(present
                 ? semester.getModules()
@@ -172,6 +177,31 @@ public final class SemestersController implements ViewController {
         } else {
             onModuleSelected(null);
         }
+        refreshMeta();
+    }
+
+    /**
+     * Schliesst das gewählte Semester ab oder öffnet es wieder.
+     *
+     * <p>Abschliessen geschieht ohne Rückfrage: es ist in zwei Klicks
+     * rückgängig gemacht und bis dahin deutlich sichtbar. Das Wiederöffnen
+     * dagegen hebt eine Sperre auf und wird deshalb erklärt und bestätigt.</p>
+     */
+    private void toggleCompleted() {
+        Semester semester = semesterList.getSelectionModel().getSelectedItem();
+        if (semester == null) {
+            return;
+        }
+        if (!semester.isCompleted()) {
+            service.completeSemester(semester);
+        } else if (Dialogs.confirm(window(), I18n.t("dialog.reopen.title"),
+                I18n.t("dialog.reopen.text", semester.getName()),
+                I18n.t("dialog.reopen.confirm"))) {
+            service.reopenSemester(semester);
+        } else {
+            return;
+        }
+        semesterList.refresh();
         refreshMeta();
     }
 
@@ -193,11 +223,11 @@ public final class SemestersController implements ViewController {
                         I18n.t("field.semesterName"), semester.getName(),
                         I18n.t("action.save"),
                         GradeValidator::requireValidText)
-                .ifPresent(name -> {
+                .ifPresent(name -> guarded(() -> {
                     service.renameSemester(semester, name);
                     semesterList.refresh();
                     refreshMeta();
-                });
+                }));
     }
 
     private void deleteSemester() {
@@ -211,7 +241,7 @@ public final class SemestersController implements ViewController {
 
         if (Dialogs.confirmDelete(window(), I18n.t("dialog.delete.semester.title"), consequence,
                 I18n.t("semesters.deleteSemester"))) {
-            service.removeSemester(semester);
+            guarded(() -> service.removeSemester(semester));
         }
     }
 
@@ -257,8 +287,8 @@ public final class SemestersController implements ViewController {
                         I18n.t("field.moduleName"), "",
                         I18n.t("action.create"),
                         GradeValidator::requireValidText)
-                .ifPresent(name -> moduleList.getSelectionModel().select(
-                        service.addModule(semester, name)));
+                .ifPresent(name -> guarded(() -> moduleList.getSelectionModel().select(
+                        service.addModule(semester, name))));
     }
 
     private void renameModule() {
@@ -270,12 +300,12 @@ public final class SemestersController implements ViewController {
                         I18n.t("field.moduleName"), module.getName(),
                         I18n.t("action.save"),
                         GradeValidator::requireValidText)
-                .ifPresent(name -> {
+                .ifPresent(name -> guarded(() -> {
                     service.renameModule(module, name);
                     moduleList.refresh();
                     gradesTitleLabel.setText(module.getName());
                     refreshMeta();
-                });
+                }));
     }
 
     private void deleteModule() {
@@ -289,7 +319,7 @@ public final class SemestersController implements ViewController {
 
         if (Dialogs.confirmDelete(window(), I18n.t("dialog.delete.module.title"), consequence,
                 I18n.t("semesters.deleteModule"))) {
-            service.removeModule(semester, module);
+            guarded(() -> service.removeModule(semester, module));
         }
     }
 
@@ -346,24 +376,27 @@ public final class SemestersController implements ViewController {
             return;
         }
         Optional<GradeDialog.Result> input = GradeDialog.forNewGrade(window(), module.getName());
-        input.ifPresent(result -> {
+        input.ifPresent(result -> guarded(() -> {
             service.addGrade(module, result.label(), result.value(), result.weight(), result.date());
             moduleList.refresh();
             refreshMeta();
-        });
+        }));
     }
 
     private void editGrade(Grade grade) {
         CourseModule module = moduleList.getSelectionModel().getSelectedItem();
-        if (module == null || grade == null) {
+        // Hierher führt auch der Doppelklick auf eine Zeile, und der lässt sich
+        // nicht ausgrauen. Ist das Semester abgeschlossen, soll deshalb gar kein
+        // Formular aufgehen, statt die Eingabe am Ende abzuweisen.
+        if (module == null || grade == null || isLocked()) {
             return;
         }
-        GradeDialog.forExistingGrade(window(), module.getName(), grade).ifPresent(result -> {
+        GradeDialog.forExistingGrade(window(), module.getName(), grade).ifPresent(result -> guarded(() -> {
             service.updateGrade(grade, result.label(), result.value(), result.weight(), result.date());
             gradesTable.refresh();
             moduleList.refresh();
             refreshMeta();
-        });
+        }));
     }
 
     private void deleteGrade(Grade grade) {
@@ -377,9 +410,11 @@ public final class SemestersController implements ViewController {
 
         if (Dialogs.confirmDelete(window(), I18n.t("dialog.delete.grade.title"), consequence,
                 I18n.t("semesters.deleteGrade"))) {
-            service.removeGrade(module, grade);
-            moduleList.refresh();
-            refreshMeta();
+            guarded(() -> {
+                service.removeGrade(module, grade);
+                moduleList.refresh();
+                refreshMeta();
+            });
         }
     }
 
@@ -470,19 +505,24 @@ public final class SemestersController implements ViewController {
             text.getChildren().add(second);
         }
 
+        boolean locked = isLocked();
+
         Button enterGrade = new Button(I18n.t("plannedExam.enterGrade"));
         enterGrade.getStyleClass().addAll("btn", "btn-tinted", "btn--compact");
         enterGrade.setMinWidth(Region.USE_PREF_SIZE);
+        enterGrade.setDisable(locked);
         enterGrade.setOnAction(event -> enterGradeFor(module, exam));
 
         Button edit = new Button();
         edit.getStyleClass().add("btn-quiet-icon");
         iconButton(edit, Icons.EDIT, I18n.t("plannedExam.edit"));
+        edit.setDisable(locked);
         edit.setOnAction(event -> editPlannedExam(module, exam));
 
         Button delete = new Button();
         delete.getStyleClass().addAll("btn-quiet-icon", "btn-quiet-icon--danger");
         iconButton(delete, Icons.DELETE, I18n.t("plannedExam.delete"));
+        delete.setDisable(locked);
         delete.setOnAction(event -> deletePlannedExam(module, exam));
 
         HBox actions = new HBox(enterGrade, edit, delete);
@@ -507,6 +547,7 @@ public final class SemestersController implements ViewController {
         Button add = new Button(I18n.t("plannedExam.add"));
         add.getStyleClass().addAll("btn", "btn-plain", "btn--compact", "planned-exam__add");
         add.setGraphic(Icons.create(Icons.PLUS, 13));
+        add.setDisable(isLocked());
         add.setOnAction(event -> createPlannedExam(module));
 
         HBox row = new HBox(add);
@@ -516,17 +557,17 @@ public final class SemestersController implements ViewController {
     }
 
     private void createPlannedExam(CourseModule module) {
-        PlannedExamDialog.forNewExam(window(), module.getName()).ifPresent(result -> {
+        PlannedExamDialog.forNewExam(window(), module.getName()).ifPresent(result -> guarded(() -> {
             service.addPlannedExam(module, result.label(), result.weight(), result.date());
             refreshMeta();
-        });
+        }));
     }
 
     private void editPlannedExam(CourseModule module, PlannedExam exam) {
-        PlannedExamDialog.forExistingExam(window(), module.getName(), exam).ifPresent(result -> {
+        PlannedExamDialog.forExistingExam(window(), module.getName(), exam).ifPresent(result -> guarded(() -> {
             service.updatePlannedExam(exam, result.label(), result.weight(), result.date());
             refreshMeta();
-        });
+        }));
     }
 
     private void deletePlannedExam(CourseModule module, PlannedExam exam) {
@@ -535,8 +576,10 @@ public final class SemestersController implements ViewController {
 
         if (Dialogs.confirmDelete(window(), I18n.t("dialog.delete.plannedExam.title"),
                 consequence, I18n.t("plannedExam.delete"))) {
-            service.removePlannedExam(module, exam);
-            refreshMeta();
+            guarded(() -> {
+                service.removePlannedExam(module, exam);
+                refreshMeta();
+            });
         }
     }
 
@@ -546,12 +589,12 @@ public final class SemestersController implements ViewController {
      * geplante Prüfung; bricht man ab, bleibt sie stehen.
      */
     private void enterGradeFor(CourseModule module, PlannedExam exam) {
-        GradeDialog.forPlannedExam(window(), module.getName(), exam).ifPresent(result -> {
+        GradeDialog.forPlannedExam(window(), module.getName(), exam).ifPresent(result -> guarded(() -> {
             service.convertToGrade(module, exam, result.label(), result.value(),
                     result.weight(), result.date());
             moduleList.refresh();
             refreshMeta();
-        });
+        }));
     }
 
     // ----- Gemeinsames ------------------------------------------------------
@@ -562,6 +605,7 @@ public final class SemestersController implements ViewController {
         semesterMetaLabel.setText(Formats.semesterCount(semesterCount));
 
         Semester semester = semesterList.getSelectionModel().getSelectedItem();
+        refreshLockState(semester);
         moduleMetaLabel.setText(semester == null
                 ? I18n.t("semesters.noSemesterSelected")
                 : I18n.t("semesters.inSemester", semester.getName()));
@@ -590,6 +634,58 @@ public final class SemestersController implements ViewController {
             moduleGradeLabel.getStyleClass().add("grade-value--none");
         }
         moduleExactLabel.setText(rounded == null ? "" : Formats.exactLabel(module.getExactAverage()));
+    }
+
+    /** {@code true}, wenn das gewählte Semester abgeschlossen und damit gesperrt ist. */
+    private boolean isLocked() {
+        Semester semester = semesterList.getSelectionModel().getSelectedItem();
+        return semester != null && semester.isCompleted();
+    }
+
+    /**
+     * Führt die Schaltflächen am Sperrzustand nach.
+     *
+     * <p>Ausgegraut heisst hier: die Person sieht sofort, dass hier nichts geht.
+     * Verhindert wird es im Service – diese Zeilen sind die Erklärung, nicht
+     * die Sperre.</p>
+     */
+    private void refreshLockState(Semester semester) {
+        boolean present = semester != null;
+        boolean open = present && !semester.isCompleted();
+
+        completeSemesterButton.setDisable(!present);
+        iconButton(completeSemesterButton,
+                present && semester.isCompleted() ? Icons.UNLOCK : Icons.LOCK,
+                I18n.t(present && semester.isCompleted()
+                        ? "semesters.reopenSemester"
+                        : "semesters.completeSemester"));
+
+        renameSemesterButton.setDisable(!open);
+        deleteSemesterButton.setDisable(!open);
+        addModuleButton.setDisable(!open);
+
+        boolean moduleSelected = moduleList.getSelectionModel().getSelectedItem() != null;
+        renameModuleButton.setDisable(!open || !moduleSelected);
+        deleteModuleButton.setDisable(!open || !moduleSelected);
+        addGradeButton.setDisable(!open || !moduleSelected);
+        gradesTable.refresh();
+    }
+
+    /**
+     * Führt eine Änderung aus und zeigt eine abgewiesene Änderung als Meldung.
+     *
+     * <p>Im Normalfall greift die Sperre nie bis hierher, weil die Schaltfläche
+     * ausgegraut ist. Falls doch – etwa über eine Tastenkombination oder einen
+     * Pfad, an den hier niemand gedacht hat –, erscheint der Grund im Klartext
+     * statt gar nichts.</p>
+     */
+    private void guarded(Runnable action) {
+        try {
+            action.run();
+        } catch (ValidationException e) {
+            Dialogs.error(window(), I18n.t("dialog.locked.title"),
+                    I18n.t(e.getMessageKey(), e.getArguments()));
+        }
     }
 
     /** Tabellenzelle für eine Zahl: gleiche Darstellung, nur rechtsbündig. */
@@ -622,16 +718,40 @@ public final class SemestersController implements ViewController {
 
         private final java.util.function.Function<T, String> titleOf;
         private final java.util.function.Function<T, String> metaOf;
+        private final java.util.function.Function<T, String> badgeOf;
         private final Label title = new Label();
         private final Label meta = new Label();
-        private final VBox box = new VBox(title, meta);
+        private final Label badge = new Label();
+        private final HBox titleRow = new HBox(title, badge);
+        private final VBox box = new VBox(titleRow, meta);
 
         private PickerCell(java.util.function.Function<T, String> titleOf,
                            java.util.function.Function<T, String> metaOf) {
+            this(titleOf, metaOf, item -> null);
+        }
+
+        private PickerCell(java.util.function.Function<T, String> titleOf,
+                           java.util.function.Function<T, String> metaOf,
+                           java.util.function.Function<T, String> badgeOf) {
             this.titleOf = titleOf;
             this.metaOf = metaOf;
+            this.badgeOf = badgeOf;
             title.getStyleClass().add("picker-cell__title");
             meta.getStyleClass().add("picker-cell__meta");
+            badge.getStyleClass().addAll("badge", "badge--stamp");
+            badge.setMinWidth(Region.USE_PREF_SIZE);
+            titleRow.getStyleClass().add("picker-cell__title-row");
+            titleRow.setAlignment(Pos.CENTER_LEFT);
+            HBox.setHgrow(title, Priority.ALWAYS);
+            title.setMinWidth(0);
+
+            // Der Eintrag darf nie breiter sein als die Liste: sonst ragt der
+            // Stempel über den Kartenrand hinaus und wird mitten im Wort
+            // abgeschnitten. So weicht zuerst der Name, der Stempel bleibt ganz.
+            box.setMinWidth(0);
+            box.prefWidthProperty().bind(Bindings.createDoubleBinding(
+                    () -> Math.max(0, getWidth() - getInsets().getLeft() - getInsets().getRight()),
+                    widthProperty(), insetsProperty()));
             box.getStyleClass().add("picker-cell");
         }
 
@@ -645,12 +765,19 @@ public final class SemestersController implements ViewController {
             }
             title.setText(titleOf.apply(item));
             meta.setText(metaOf.apply(item));
+
+            String stamp = badgeOf.apply(item);
+            badge.setText(stamp == null ? "" : stamp);
+            badge.setVisible(stamp != null);
+            badge.setManaged(stamp != null);
+
             box.getStyleClass().remove("picker-cell--selected");
             if (isSelected()) {
                 box.getStyleClass().add("picker-cell--selected");
             }
             setGraphic(box);
-            setAccessibleText(title.getText() + ", " + meta.getText());
+            setAccessibleText(title.getText() + ", " + meta.getText()
+                    + (stamp == null ? "" : ", " + stamp));
         }
 
         @Override
@@ -686,6 +813,9 @@ public final class SemestersController implements ViewController {
                 setGraphic(null);
                 return;
             }
+            boolean locked = isLocked();
+            edit.setDisable(locked);
+            delete.setDisable(locked);
             edit.setOnAction(event -> editGrade(grade));
             delete.setOnAction(event -> deleteGrade(grade));
             setGraphic(box);

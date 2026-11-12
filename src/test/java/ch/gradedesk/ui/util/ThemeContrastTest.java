@@ -119,7 +119,10 @@ class ThemeContrastTest {
             new Combination("Grenzlinie 4.0 im Diagramm", "-ui-text", "-ui-bg-surface", ELEMENT),
             new Combination("Abzeichen Note ausstehend", "-ui-warn", "-ui-warn-wash", TEXT),
             new Combination("Link Pruefung eintragen", "-ui-accent", "-ui-bg-surface", TEXT),
-            new Combination("Gewichtung der geplanten Pruefung", "-ui-text-tertiary", "-ui-bg-surface", TEXT));
+            new Combination("Gewichtung der geplanten Pruefung", "-ui-text-tertiary", "-ui-bg-surface", TEXT),
+            new Combination("Stempel Abgeschlossen auf Karte", "-ui-text-secondary", "-ui-bg-surface", TEXT),
+            new Combination("Stempel auf ausgewaehlter Zeile", "-ui-text-secondary", "-ui-selection", TEXT),
+            new Combination("Stempelkante auf ausgewaehlter Zeile", "-ui-text-tertiary", "-ui-selection", ELEMENT));
 
     @Test
     @DisplayName("Beide Paletten führen genau dieselben Variablen")

@@ -27,6 +27,7 @@ public final class GradeValidator {
     public static final String ERR_TEXT_TOO_LONG = "validation.text.tooLong";
     public static final String ERR_DATE_MISSING = "validation.date.missing";
     public static final String ERR_NUMBER_INVALID = "validation.number.invalid";
+    public static final String ERR_SEMESTER_COMPLETED = "validation.semester.completed";
 
     private GradeValidator() {
     }
