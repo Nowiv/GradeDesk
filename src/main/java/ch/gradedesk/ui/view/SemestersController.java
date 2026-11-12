@@ -17,6 +17,7 @@ import ch.gradedesk.ui.control.PlannedExamDialog;
 import ch.gradedesk.ui.util.Formats;
 import ch.gradedesk.ui.util.Icons;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -740,6 +741,14 @@ public final class SemestersController implements ViewController {
             titleRow.setAlignment(Pos.CENTER_LEFT);
             HBox.setHgrow(title, Priority.ALWAYS);
             title.setMinWidth(0);
+
+            // Der Eintrag darf nie breiter sein als die Liste: sonst ragt der
+            // Stempel über den Kartenrand hinaus und wird mitten im Wort
+            // abgeschnitten. So weicht zuerst der Name, der Stempel bleibt ganz.
+            box.setMinWidth(0);
+            box.prefWidthProperty().bind(Bindings.createDoubleBinding(
+                    () -> Math.max(0, getWidth() - getInsets().getLeft() - getInsets().getRight()),
+                    widthProperty(), insetsProperty()));
             box.getStyleClass().add("picker-cell");
         }
 

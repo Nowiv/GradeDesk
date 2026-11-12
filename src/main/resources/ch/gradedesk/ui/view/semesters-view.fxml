@@ -29,7 +29,7 @@
         <HBox styleClass="page-body">
 
             <!-- Spalte 1: Semester -->
-            <VBox maxWidth="266.0" minWidth="176.0" prefWidth="250.0" styleClass="card">
+            <VBox maxWidth="266.0" minWidth="212.0" prefWidth="250.0" styleClass="card">
                 <HBox styleClass="card__header">
                     <VBox HBox.hgrow="ALWAYS">
                         <Label styleClass="card__title" text="%semesters.semesters"/>
