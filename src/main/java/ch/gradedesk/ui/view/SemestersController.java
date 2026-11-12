@@ -385,7 +385,10 @@ public final class SemestersController implements ViewController {
 
     private void editGrade(Grade grade) {
         CourseModule module = moduleList.getSelectionModel().getSelectedItem();
-        if (module == null || grade == null) {
+        // Hierher führt auch der Doppelklick auf eine Zeile, und der lässt sich
+        // nicht ausgrauen. Ist das Semester abgeschlossen, soll deshalb gar kein
+        // Formular aufgehen, statt die Eingabe am Ende abzuweisen.
+        if (module == null || grade == null || isLocked()) {
             return;
         }
         GradeDialog.forExistingGrade(window(), module.getName(), grade).ifPresent(result -> guarded(() -> {
